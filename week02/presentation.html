@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2주차: React 기초</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root {
+            --likelion-orange: #FF6B00;
+            --likelion-orange-light: #FF8C42;
+            --likelion-bg: #0D0D0D;
+        }
+        .reveal { background-color: var(--likelion-bg); }
+        .reveal .slides { background-color: var(--likelion-bg); }
+        .reveal .slides section { text-align: left; }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--likelion-orange) !important; }
+        .reveal p, .reveal li { color: #E8E8E8; }
+        .reveal .slides section.title-slide { text-align: center; }
+        .reveal .slides section.title-slide h1,
+        .reveal .slides section.title-slide h2,
+        .reveal .slides section.title-slide p { color: var(--likelion-orange) !important; }
+        .reveal code { background-color: #1a1a1a; color: var(--likelion-orange-light); padding: 2px 6px; border-radius: 3px; border: 1px solid #333; }
+        .reveal pre code { background-color: #1a1a1a; color: #E8E8E8; padding: 15px; border-radius: 5px; border: 1px solid #333; }
+        .reveal ul, .reveal ol { margin-left: 1.5em; }
+        .reveal .progress { color: var(--likelion-orange) !important; background: rgba(255, 107, 0, 0.2); }
+        .reveal .controls button { color: var(--likelion-orange) !important; }
+        .reveal a { color: var(--likelion-orange-light); }
+        .reveal a:hover { color: var(--likelion-orange); }
+        .reveal pre { max-height: 52vh; overflow: auto !important; margin: 0.8em 0; border-radius: 6px; }
+        .reveal pre code { font-size: 0.65em; line-height: 1.35; padding: 1rem; white-space: pre; }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide { align-items: center; }
+        .reveal strong { color: var(--likelion-orange-light); }
+        @media print { .reveal .slides section { page-break-after: always; } }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>2주차</h1>
+                <h2>React 기초</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+            </section>
+
+            <!-- 비전공자용: React 한줄 요약 -->
+            <section>
+                <h3>💡 React, 한 줄로 말하면?</h3>
+                <p>"레고 블록처럼 UI를 조각내서 만드는 도구"</p>
+                <ul style="font-size: 0.9em; margin-top: 1em;">
+                    <li><strong>컴포넌트</strong> = 레고 블록 하나 (버튼, 카드, 헤더 등)</li>
+                    <li>블록을 조합해서 화면 완성 → 수정·재사용이 쉬움</li>
+                    <li>Vanilla JS = 직접 도끼로 나무 베기 / React = 공장에서 나온 레고 블록 조립</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>React의 개념과 장점을 이해한다</li>
+                    <li>JSX 문법을 사용할 수 있다</li>
+                    <li>컴포넌트를 만들고 사용할 수 있다</li>
+                    <li>Props와 State를 이해하고 활용한다</li>
+                    <li>이벤트를 처리할 수 있다</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>1. React 소개 (30분)</h2>
+            </section>
+
+            <section>
+                <h3>1.1 React란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: 사용자 인터페이스를 구축하기 위한 JavaScript 라이브러리</li>
+                    <li><strong>개발사</strong>: Facebook (Meta)</li>
+                    <li><strong>특징</strong>:
+                        <ul>
+                            <li>컴포넌트 기반 개발</li>
+                            <li>가상 DOM (Virtual DOM)</li>
+                            <li>단방향 데이터 흐름</li>
+                            <li>재사용 가능한 UI 컴포넌트</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>가상 DOM (Virtual DOM)이란?</h3>
+                <ul>
+                    <li><strong>실제 DOM</strong>: 브라우저가 화면을 그리기 위해 사용하는 객체 트리. 직접 수정하면 비용이 큼</li>
+                    <li><strong>가상 DOM</strong>: React가 메모리에 유지하는 가벼운 복사본</li>
+                    <li><strong>동작 방식</strong>: State 변경 → 가상 DOM 비교(diff) → 변경된 부분만 실제 DOM에 반영 → 렌더링 최적화</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>1.2 React의 장점</h3>
+                <ul>
+                    <li><strong>컴포넌트 재사용성</strong>: 한 번 만든 컴포넌트를 여러 곳에서 사용</li>
+                    <li><strong>가상 DOM</strong>: diff 알고리즘으로 최소한의 DOM만 업데이트 → 성능 최적화</li>
+                    <li><strong>풍부한 생태계</strong>: 다양한 라이브러리와 도구</li>
+                    <li><strong>커뮤니티</strong>: 활발한 개발자 커뮤니티</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>1.3 React vs Vanilla JavaScript</h3>
+                <pre><code class="javascript">// Vanilla JavaScript
+const button = document.createElement('button');
+button.textContent = 'Click me';
+button.addEventListener('click', () => {
+    alert('Clicked!');
+});
+document.body.appendChild(button);
+
+// React
+function Button() {
+    return (
+        &lt;button onClick={() => alert('Clicked!')}&gt;
+            Click me
+        &lt;/button&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>2. JSX 문법 (60분)</h2>
+            </section>
+
+            <section>
+                <h3>2.1 JSX란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: JavaScript XML - JavaScript에 XML/HTML 문법을 추가한 것</li>
+                    <li><strong>특징</strong>: React.createElement()의 문법적 설탕</li>
+                    <li><strong>왜 className?</strong> JavaScript에서 <code>class</code>는 예약어이므로 <code>className</code> 사용</li>
+                    <li><strong>왜 style은 객체?</strong> JSX는 JavaScript이므로 CSS 문자열 대신 객체로 전달</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.2 JSX 기본 문법</h3>
+                <pre><code class="jsx">// 기본 구조
+const element = &lt;h1&gt;Hello, World!&lt;/h1&gt;;
+
+// JavaScript 표현식 사용
+const name = "John";
+const element = &lt;h1&gt;Hello, {name}!&lt;/h1&gt;;
+
+// 속성 사용
+const element = &lt;img src="image.jpg" alt="Description" /&gt;;
+
+// 클래스명 (className 사용)
+const element = &lt;div className="container"&gt;Content&lt;/div&gt;;</code></pre>
+            </section>
+
+            <section>
+                <h3>2.3 JSX 규칙</h3>
+                <p><strong>1. 하나의 부모 요소</strong></p>
+                <pre><code class="jsx">// ❌ 잘못된 예
+return (
+    &lt;h1&gt;Title&lt;/h1&gt;
+    &lt;p&gt;Content&lt;/p&gt;
+);
+
+// ✅ 올바른 예
+return (
+    &lt;div&gt;
+        &lt;h1&gt;Title&lt;/h1&gt;
+        &lt;p&gt;Content&lt;/p&gt;
+    &lt;/div&gt;
+);</code></pre>
+            </section>
+
+            <section>
+                <h3>JSX 규칙 (계속)</h3>
+                <p><strong>2. Fragment 사용</strong></p>
+                <pre><code class="jsx">return (
+    &lt;&gt;
+        &lt;h1&gt;Title&lt;/h1&gt;
+        &lt;p&gt;Content&lt;/p&gt;
+    &lt;/&gt;
+);</code></pre>
+                <p><strong>3. 자기 닫는 태그</strong></p>
+                <pre><code class="jsx">&lt;img src="..." alt="..." /&gt;
+&lt;br /&gt;
+&lt;input type="text" /&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>3. 컴포넌트 기초 (90분)</h2>
+            </section>
+
+            <section>
+                <h3>3.1 컴포넌트란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: UI를 독립적이고 재사용 가능한 조각으로 나눈 것</li>
+                    <li><strong>종류</strong>:
+                        <ul>
+                            <li>함수형 컴포넌트 (Function Component) - 권장</li>
+                            <li>클래스형 컴포넌트 (Class Component) - 레거시</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>3.2 함수형 컴포넌트</h3>
+                <pre><code class="jsx">// 기본 형태
+function Welcome() {
+    return &lt;h1&gt;Hello, World!&lt;/h1&gt;;
+}
+
+// 화살표 함수
+const Welcome = () => {
+    return &lt;h1&gt;Hello, World!&lt;/h1&gt;;
+};
+
+// 간단한 경우 중괄호 생략 가능
+const Welcome = () => &lt;h1&gt;Hello, World!&lt;/h1&gt;;</code></pre>
+            </section>
+
+            <section>
+                <h3>3.3 컴포넌트 사용</h3>
+                <pre><code class="jsx">// 컴포넌트 정의
+function Welcome() {
+    return &lt;h1&gt;Welcome!&lt;/h1&gt;;
+}
+
+// 컴포넌트 사용
+function App() {
+    return (
+        &lt;div&gt;
+            &lt;Welcome /&gt;
+            &lt;Welcome /&gt;
+            &lt;Welcome /&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>4. Props (60분)</h2>
+            </section>
+
+            <!-- 비전공자용: Props vs State 구분법 -->
+            <section>
+                <h3>💡 Props vs State, 쉽게 구분하는 법</h3>
+                <ul style="font-size: 0.9em;">
+                    <li><strong>Props</strong>: "부모가 건네준 데이터" → 받기만 하고 바꾸지 않음 (예: 제목, 이름)</li>
+                    <li><strong>State</strong>: "이 컴포넌트가 스스로 갖고 있는 데이터" → 버튼 클릭 등으로 바뀜 (예: 카운트, 체크 여부)</li>
+                    <li><strong>질문</strong>: "이 값이 바뀌나?" → Yes: State / No: Props</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>4.1 Props란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: Properties의 약자</li>
+                    <li>부모 컴포넌트에서 자식 컴포넌트로 데이터를 전달하는 방법</li>
+                    <li><strong>특징</strong>: 읽기 전용 (immutable)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>4.1 Props vs State</h3>
+                <ul>
+                    <li><strong>Props</strong>: 부모에서 전달, 자식이 변경 불가 → 외부 데이터</li>
+                    <li><strong>State</strong>: 컴포넌트 내부 관리, 변경 시 리렌더링 → 내부 상태</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>4.2 Props 사용하기</h3>
+                <pre><code class="jsx">// 부모 컴포넌트
+function App() {
+    return (
+        &lt;div&gt;
+            &lt;Greeting name="John" age={25} /&gt;
+            &lt;Greeting name="Jane" age={30} /&gt;
+        &lt;/div&gt;
+    );
+}
+
+// 자식 컴포넌트
+function Greeting(props) {
+    return (
+        &lt;div&gt;
+            &lt;h1&gt;Hello, {props.name}!&lt;/h1&gt;
+            &lt;p&gt;You are {props.age} years old.&lt;/p&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>4.3 구조 분해 할당</h3>
+                <pre><code class="jsx">// 방법 1: 함수 매개변수에서 구조 분해
+function Greeting({ name, age }) {
+    return (
+        &lt;div&gt;
+            &lt;h1&gt;Hello, {name}!&lt;/h1&gt;
+            &lt;p&gt;You are {age} years old.&lt;/p&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>5. State (90분)</h2>
+            </section>
+
+            <section>
+                <h3>5.1 State란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: 컴포넌트 내부에서 변경 가능한 데이터</li>
+                    <li><strong>특징</strong>:
+                        <ul>
+                            <li>State가 변경되면 컴포넌트가 다시 렌더링됨</li>
+                            <li>useState Hook을 사용하여 관리</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>5.2 useState Hook</h3>
+                <pre><code class="jsx">import { useState } from 'react';
+
+function Counter() {
+    // useState 사용법
+    // const [상태값, 상태변경함수] = useState(초기값);
+    const [count, setCount] = useState(0);
+    
+    return (
+        &lt;div&gt;
+            &lt;p&gt;Count: {count}&lt;/p&gt;
+            &lt;button onClick={() => setCount(count + 1)}&gt;
+                Increase
+            &lt;/button&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>5.3 State 업데이트 - 핵심 개념</h3>
+                <p><strong>함수형 업데이트</strong>: <code>setCount(prev => prev + 1)</code></p>
+                <ul>
+                    <li>이전 값 기반으로 갱신 → 비동기·연속 클릭 시 항상 최신 값 반영</li>
+                    <li><code>setCount(count + 1)</code>: 현재 count 기준 → 연속 클릭 시 값 꼬일 수 있음</li>
+                    <li><code>setCount(prev => prev + 1)</code>: 이전 값 기준 → ✅ 권장</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>5.3 State 업데이트 - 코드 예시</h3>
+                <pre><code class="jsx">function Counter() {
+    const [count, setCount] = useState(0);
+    
+    // 직접 증가 (연속 클릭 시 주의)
+    const handleIncrease = () => setCount(count + 1);
+    
+    // 함수형 업데이트 (이전 값 사용) ✅ 권장
+    const handleIncrease = () => {
+        setCount(prevCount => prevCount + 1);
+    };
+    
+    return (
+        &lt;div&gt;
+            &lt;p&gt;Count: {count}&lt;/p&gt;
+            &lt;button onClick={handleIncrease}&gt;Increase&lt;/button&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>5.4 여러 State 사용</h3>
+                <pre><code class="jsx">function Form() {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [age, setAge] = useState(0);
+    
+    return (
+        &lt;form&gt;
+            &lt;input 
+                type="text" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Name"
+            /&gt;
+            &lt;input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+            /&gt;
+        &lt;/form&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>6. 이벤트 처리 (60분)</h2>
+            </section>
+
+            <section>
+                <h3>6.1 이벤트 핸들러</h3>
+                <pre><code class="jsx">function Button() {
+    const handleClick = () => {
+        alert('Button clicked!');
+    };
+    
+    return &lt;button onClick={handleClick}&gt;Click me&lt;/button&gt;;
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>6.2 주요 이벤트</h3>
+                <ul>
+                    <li><code>onClick</code>: 클릭 이벤트</li>
+                    <li><code>onChange</code>: 입력값 변경</li>
+                    <li><code>onSubmit</code>: 폼 제출</li>
+                    <li><code>onFocus</code>: 포커스 받을 때</li>
+                    <li><code>onBlur</code>: 포커스 잃을 때</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>6.3 폼 처리</h3>
+                <pre><code class="jsx">function LoginForm() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    
+    const handleSubmit = (e) => {
+        e.preventDefault();  // 기본 동작 방지
+        console.log('Email:', email);
+        console.log('Password:', password);
+    };
+    
+    return (
+        &lt;form onSubmit={handleSubmit}&gt;
+            &lt;input 
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+            /&gt;
+            &lt;button type="submit"&gt;Login&lt;/button&gt;
+        &lt;/form&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>🔧 React 프로젝트 생성 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: 터미널 열기</p>
+                <ul style="font-size: 0.9em;">
+                    <li>VS Code: <strong>Ctrl+`</strong> (Windows) / <strong>Cmd+`</strong> (Mac)</li>
+                    <li>또는 Spotlight: <strong>Cmd+Space</strong> → "터미널" (Mac)</li>
+                </ul>
+                <p><strong>2단계</strong>: 프로젝트 생성</p>
+                <pre><code class="bash">npx create-react-app my-first-app
+cd my-first-app</code></pre>
+            </section>
+            <section>
+                <h3>🔧 React 프로젝트 생성 - 따라하기 (2/2)</h3>
+                <p><strong>3단계</strong>: 개발 서버 실행</p>
+                <pre><code class="bash">npm start</code></pre>
+                <p>브라우저에서 <code>http://localhost:3000</code> 자동 열림</p>
+            </section>
+
+            <section>
+                <h3>React 프로젝트 생성 - 참고</h3>
+                <ul style="font-size: 0.9em;">
+                    <li><code>npx</code>: npm 패키지를 설치 없이 한 번만 실행. Create React App을 바로 실행</li>
+                    <li><code>create-react-app</code>: React 기본 구조를 자동 생성. 설정 파일, 폴더 구조 모두 준비됨</li>
+                    <li><code>npm start</code>: 개발 서버 실행. 코드 수정 시 자동 새로고침(핫 리로드)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>7. 실습: 카운터 앱 만들기 (30분)</h2>
+                <h3>요구사항</h3>
+                <ul>
+                    <li>증가/감소 버튼</li>
+                    <li>리셋 버튼</li>
+                    <li>현재 카운트 표시</li>
+                    <li>음수일 때 빨간색으로 표시</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>예시 코드</h3>
+                <pre><code class="jsx">import { useState } from 'react';
+
+function Counter() {
+    const [count, setCount] = useState(0);
+    
+    const increase = () => setCount(count + 1);
+    const decrease = () => setCount(count - 1);
+    const reset = () => setCount(0);
+    
+    return (
+        &lt;div&gt;
+            &lt;h1&gt;Counter: &lt;span style={{ color: count < 0 ? 'red' : 'black' }}&gt;
+                {count}
+            &lt;/span&gt;&lt;/h1&gt;
+            &lt;button onClick={increase}&gt;+&lt;/button&gt;
+            &lt;button onClick={decrease}&gt;-&lt;/button&gt;
+            &lt;button onClick={reset}&gt;Reset&lt;/button&gt;
+        &lt;/div&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ React는 컴포넌트 기반 UI 라이브러리</li>
+                    <li>✅ JSX는 JavaScript에 HTML 문법을 추가한 것</li>
+                    <li>✅ 컴포넌트는 재사용 가능한 UI 조각</li>
+                    <li>✅ Props는 부모에서 자식으로 데이터 전달</li>
+                    <li>✅ State는 컴포넌트 내부의 변경 가능한 데이터</li>
+                    <li>✅ 이벤트 핸들러로 사용자 상호작용 처리</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>개인 정보를 표시하는 Profile 컴포넌트 만들기</li>
+                    <li>간단한 계산기 컴포넌트 만들기 (덧셈, 뺄셈)</li>
+                    <li>다음 주차 준비: React Hooks 문서 읽어오기</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://react.dev/">React 공식 문서</a></li>
+                    <li><a href="https://beta.react.dev/">React Beta 문서</a></li>
+                    <li><a href="https://react.dev/learn/writing-markup-with-jsx">JSX 소개</a></li>
+                </ul>
+            </section>
+
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    
+    <script>
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>
+

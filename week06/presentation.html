@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>6주차: 프론트엔드-백엔드 연동</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root { --likelion-orange: #FF6B00; --likelion-orange-light: #FF8C42; --likelion-bg: #0D0D0D; }
+        .reveal { background-color: var(--likelion-bg); }
+        .reveal .slides { background-color: var(--likelion-bg); }
+        .reveal .slides section { text-align: left; }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--likelion-orange) !important; }
+        .reveal p, .reveal li { color: #E8E8E8; }
+        .reveal .slides section.title-slide { text-align: center; }
+        .reveal .slides section.title-slide h1, .reveal .slides section.title-slide h2, .reveal .slides section.title-slide p { color: var(--likelion-orange) !important; }
+        .reveal code { background-color: #1a1a1a; color: var(--likelion-orange-light); padding: 2px 6px; border-radius: 3px; border: 1px solid #333; }
+        .reveal pre code { background-color: #1a1a1a; color: #E8E8E8; padding: 15px; border-radius: 5px; border: 1px solid #333; }
+        .reveal ul, .reveal ol { margin-left: 1.5em; }
+        .reveal .progress { color: var(--likelion-orange) !important; background: rgba(255, 107, 0, 0.2); }
+        .reveal .controls button { color: var(--likelion-orange) !important; }
+        .reveal a { color: var(--likelion-orange-light); }
+        .reveal a:hover { color: var(--likelion-orange); }
+        .reveal pre { max-height: 52vh; overflow: auto !important; margin: 0.8em 0; border-radius: 6px; }
+        .reveal pre code { font-size: 0.65em; line-height: 1.35; padding: 1rem; white-space: pre; }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide { align-items: center; }
+        .reveal strong { color: var(--likelion-orange-light); }
+        @media print { .reveal .slides section { page-break-after: always; } }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>6주차</h1>
+                <h2>프론트엔드-백엔드 연동</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+                <p>React + Java Spring Boot</p>
+            </section>
+
+            <!-- 비전공자용: CORS, Axios 쉽게 이해 -->
+            <section>
+                <h3>💡 CORS, Axios - 왜 필요한가?</h3>
+                <ul style="font-size: 0.85em;">
+                    <li><strong>CORS</strong>: "다른 주소(예: localhost:3000→8080)에서 오는 요청"을 허용할지 정하는 것. 브라우저 보안 때문에 기본적으로 막힘</li>
+                    <li><strong>Axios</strong>: fetch보다 쓰기 편한 HTTP 클라이언트. 인터셉터, 기본 URL 설정 등</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>CORS를 이해하고 설정할 수 있다</li>
+                    <li>Axios를 사용하여 API를 호출할 수 있다</li>
+                    <li>에러 처리 및 로딩 상태를 관리할 수 있다</li>
+                    <li>React와 Spring Boot를 통합할 수 있다</li>
+                    <li>실제 프로젝트를 완성할 수 있다</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>1. CORS 설정</h2>
+            </section>
+
+            <section>
+                <h3>1.1 CORS란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: Cross-Origin Resource Sharing - 다른 출처(도메인) 리소스 접근 허용</li>
+                    <li><strong>Same-Origin Policy</strong>: 보안상 브라우저는 다른 출처 요청을 기본 차단</li>
+                    <li><strong>문제</strong>: React(localhost:3000) → Spring(localhost:8080) 시 출처가 달라 차단됨</li>
+                    <li><strong>해결</strong>: 서버에서 허용할 출처/메서드를 명시적으로 설정</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>1.2 Spring Boot CORS 설정</h3>
+                <pre><code class="java">@Configuration
+public class CorsConfig {
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/**")
+                    .allowedOrigins("http://localhost:3000")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                    .allowedHeaders("*")
+                    .allowCredentials(true);
+            }
+        };
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>Axios 설치 - 따라하기</h3>
+                <p><strong>1단계</strong>: React 프로젝트 폴더에서 터미널 열기</p>
+                <p><strong>2단계</strong>: 아래 명령어 입력</p>
+                <pre><code class="bash">npm install axios</code></pre>
+                <p><strong>3단계</strong>: <code>package.json</code>에 <code>axios</code>가 추가됐는지 확인</p>
+            </section>
+
+            <section>
+                <h3>프론트·백엔드 동시 실행 - 따라하기 (1/2)</h3>
+                <p><strong>터미널 1</strong> (백엔드): <code>cd backend</code> 후</p>
+                <pre><code class="bash"># Windows
+mvnw.cmd spring-boot:run
+
+# Mac/Linux
+./mvnw spring-boot:run</code></pre>
+            </section>
+            <section>
+                <h3>프론트·백엔드 동시 실행 - 따라하기 (2/2)</h3>
+                <p><strong>터미널 2</strong> (프론트): <code>cd frontend</code> → <code>npm start</code></p>
+                <p>둘 다 실행 후 <code>http://localhost:3000</code> 접속</p>
+                <p style="font-size: 0.9em;">Mac: Cmd+Space → Safari/Chrome</p>
+            </section>
+
+            <section>
+                <h2>2. Axios</h2>
+            </section>
+
+            <section>
+                <h3>2.1 Axios란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: HTTP 클라이언트 라이브러리</li>
+                    <li><strong>fetch vs Axios</strong>: fetch는 저수준. Axios는 인터셉터, 자동 JSON 변환, 에러 처리 편의</li>
+                    <li><strong>설치</strong>: <code>npm install axios</code></li>
+                    <li>Promise 기반, 브라우저/Node.js 지원</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.2 기본 사용법</h3>
+                <pre><code class="javascript">import axios from 'axios';
+
+// GET 요청
+axios.get('/api/todos')
+    .then(response => console.log(response.data))
+    .catch(error => console.error(error));
+
+// POST 요청
+axios.post('/api/todos', { title: 'New Todo', completed: false })
+    .then(response => console.log(response.data));</code></pre>
+            </section>
+
+            <section>
+                <h3>2.3 Axios 인스턴스</h3>
+                <pre><code class="javascript">const api = axios.create({
+    baseURL: 'http://localhost:8080/api',
+    timeout: 10000,
+    headers: { 'Content-Type': 'application/json' }
+});
+
+api.get('/todos');
+api.post('/todos', todoData);</code></pre>
+            </section>
+
+            <section>
+                <h3>3.1 커스텀 Hook (useTodos)</h3>
+                <pre><code class="javascript">function useTodos() {
+    const [todos, setTodos] = useState([]);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => { fetchTodos(); }, []);
+    
+    const fetchTodos = async () => {
+        const response = await api.get('/todos');
+        setTodos(response.data);
+        setLoading(false);
+    };
+    
+    return { todos, loading, fetchTodos, createTodo, updateTodo, deleteTodo };
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ CORS 설정으로 크로스 오리진 요청 허용</li>
+                    <li>✅ Axios로 API 호출</li>
+                    <li>✅ 커스텀 Hook으로 로딩/에러 상태 관리</li>
+                    <li>✅ React와 Spring Boot 통합</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>Todo 앱 프론트-백엔드 연동 완성</li>
+                    <li>에러 처리 및 로딩 UI 추가</li>
+                    <li>다음 주차 준비: JWT 인증 문서 읽어오기</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://axios-http.com/">Axios 공식 문서</a></li>
+                </ul>
+            </section>
+
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: true, transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            pdfMaxPagesPerSlide: 1, pdfSeparateFragments: false
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4주차: Spring Boot 기초</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    
+    <!-- Code highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root {
+            --likelion-orange: #FF6B00;
+            --likelion-orange-light: #FF8C42;
+            --likelion-bg: #0D0D0D;
+        }
+        .reveal { background-color: var(--likelion-bg); }
+        .reveal .slides { background-color: var(--likelion-bg); }
+        .reveal .slides section { text-align: left; }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--likelion-orange) !important; }
+        .reveal p, .reveal li { color: #E8E8E8; }
+        .reveal .slides section.title-slide { text-align: center; }
+        .reveal .slides section.title-slide h1, .reveal .slides section.title-slide h2, .reveal .slides section.title-slide p { color: var(--likelion-orange) !important; }
+        .reveal code { background-color: #1a1a1a; color: var(--likelion-orange-light); padding: 2px 6px; border-radius: 3px; border: 1px solid #333; }
+        .reveal pre code { background-color: #1a1a1a; color: #E8E8E8; padding: 15px; border-radius: 5px; border: 1px solid #333; }
+        .reveal ul, .reveal ol { margin-left: 1.5em; }
+        .reveal .progress { color: var(--likelion-orange) !important; background: rgba(255, 107, 0, 0.2); }
+        .reveal .controls button { color: var(--likelion-orange) !important; }
+        .reveal a { color: var(--likelion-orange-light); }
+        .reveal a:hover { color: var(--likelion-orange); }
+        .reveal pre { max-height: 52vh; overflow: auto !important; margin: 0.8em 0; border-radius: 6px; }
+        .reveal pre code { font-size: 0.65em; line-height: 1.35; padding: 1rem; white-space: pre; }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide { align-items: center; }
+        .reveal strong { color: var(--likelion-orange-light); }
+        @media print { .reveal .slides section { page-break-after: always; } }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>4주차</h1>
+                <h2>Spring Boot 기초</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+                <p>React + Java Spring Boot</p>
+            </section>
+
+            <!-- 비전공자용: MVC, REST 쉽게 이해 -->
+            <section>
+                <h3>💡 MVC, 한 줄로 말하면?</h3>
+                <p>"역할을 나눠서 일하게 하는 구조"</p>
+                <ul style="font-size: 0.85em; margin-top: 1em;">
+                    <li><strong>Controller</strong>: 손님 주문 받기 (HTTP 요청 받음)</li>
+                    <li><strong>Service</strong>: 주방에서 요리 (비즈니스 로직)</li>
+                    <li><strong>Repository</strong>: 냉장고에서 재료 꺼내기 (DB 접근)</li>
+                    <li><strong>REST</strong>: "이 URL로 이렇게 요청하면 이렇게 응답" 하는 약속 (규칙)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>Spring Boot의 개념과 장점을 이해한다</li>
+                    <li>Spring Boot 프로젝트를 생성하고 실행할 수 있다</li>
+                    <li>Spring MVC 패턴을 이해한다</li>
+                    <li>RESTful API를 설계하고 구현할 수 있다</li>
+                    <li>컨트롤러, 서비스, 리포지토리 계층을 이해한다</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>1. Spring Boot 소개 (30분)</h2>
+            </section>
+
+            <section>
+                <h3>1.1 Spring Boot란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: Spring Framework 기반의 프로덕션 준비가 된 애플리케이션을 빠르게 만들 수 있게 해주는 프레임워크</li>
+                    <li><strong>특징</strong>: 자동 설정, 내장 서버(Tomcat), 프로덕션 준비 기능, 의존성 관리</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2. Spring Initializr - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://start.spring.io/" target="_blank">start.spring.io</a> 접속</p>
+                <p><strong>2단계</strong>: Project: Maven, Language: Java, Spring Boot: 최신 LTS</p>
+                <p><strong>3단계</strong>: Group: <code>com.likelion</code>, Artifact: <code>todo-api</code></p>
+            </section>
+            <section>
+                <h3>2. Spring Initializr - 따라하기 (2/2)</h3>
+                <p><strong>4단계</strong>: ADD DEPENDENCIES → Spring Web, Spring Data JPA, PostgreSQL Driver 선택</p>
+                <p><strong>5단계</strong>: GENERATE 클릭 → ZIP 다운로드 → 압축 해제</p>
+            </section>
+
+            <section>
+                <h3>2-2. 프로젝트 실행 - 따라하기 (1/2)</h3>
+                <p><strong>터미널에서</strong> (프로젝트 폴더로 이동 후):</p>
+                <pre><code class="bash"># Windows
+mvnw.cmd spring-boot:run
+
+# Mac/Linux
+./mvnw spring-boot:run</code></pre>
+            </section>
+            <section>
+                <h3>2-2. 프로젝트 실행 - 따라하기 (2/2)</h3>
+                <p><strong>또는</strong> IntelliJ에서 <code>TodoApiApplication.java</code> 우클릭 → Run</p>
+                <p>성공 시 <code>http://localhost:8080</code> 에서 접속 가능</p>
+            </section>
+
+            <section>
+                <h3>Postman 설치 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://www.postman.com/downloads/" target="_blank">postman.com/downloads</a> 접속</p>
+                <p><strong>2단계</strong>: OS에 맞게 다운로드 → 설치</p>
+                <p><strong>3단계</strong>: 실행 후 New → HTTP Request</p>
+            </section>
+            <section>
+                <h3>Postman 설치 - 따라하기 (2/2)</h3>
+                <p><strong>사용법</strong>: GET/POST 등 선택, URL 입력, Send 클릭 → 응답 확인</p>
+            </section>
+
+            <section>
+                <h3>2.2 프로젝트 구조</h3>
+                <pre><code>todo-api/
+├── src/main/java/.../TodoApiApplication.java
+├── src/main/resources/application.properties
+├── src/test/
+├── pom.xml
+└── README.md</code></pre>
+            </section>
+
+            <section>
+                <h3>2.3 첫 번째 애플리케이션</h3>
+                <pre><code class="java">@SpringBootApplication
+public class TodoApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(TodoApiApplication.class, args);
+    }
+}</code></pre>
+                <p><code>./mvnw spring-boot:run</code></p>
+            </section>
+
+            <section>
+                <h2>3. Spring MVC 패턴 (60분)</h2>
+            </section>
+
+            <section>
+                <h3>3.1 MVC 패턴</h3>
+                <ul>
+                    <li><strong>Model</strong>: 데이터와 비즈니스 로직</li>
+                    <li><strong>View</strong>: REST API에서는 JSON 응답</li>
+                    <li><strong>Controller</strong>: 요청 처리 및 응답 반환</li>
+                </ul>
+                <p style="margin-top: 1em;"><strong>계층 분리의 이유</strong>: 역할 분리로 유지보수·테스트·협업이 쉬워짐</p>
+            </section>
+
+            <section>
+                <h3>3.2 계층 구조</h3>
+                <pre><code>Controller → Service → Repository → Database</code></pre>
+            </section>
+
+            <section>
+                <h3>3.3 Controller 예시</h3>
+                <pre><code class="java">@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+    private final TodoService todoService;
+    
+    @GetMapping
+    public List&lt;Todo&gt; getAllTodos() { return todoService.getAllTodos(); }
+    
+    @GetMapping("/{id}")
+    public Todo getTodo(@PathVariable Long id) { return todoService.getTodoById(id); }
+    
+    @PostMapping
+    public Todo createTodo(@RequestBody Todo todo) { return todoService.createTodo(todo); }
+    
+    @DeleteMapping("/{id}")
+    public void deleteTodo(@PathVariable Long id) { todoService.deleteTodo(id); }
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>3.4 Service 예시</h3>
+                <pre><code class="java">@Service
+public class TodoService {
+    private final TodoRepository todoRepository;
+    
+    public List&lt;Todo&gt; getAllTodos() { return todoRepository.findAll(); }
+    
+    public Todo getTodoById(Long id) {
+        return todoRepository.findById(id)
+            .orElseThrow(() -&gt; new RuntimeException("Todo not found"));
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>3.5 Repository 예시</h3>
+                <pre><code class="java">public interface TodoRepository extends JpaRepository&lt;Todo, Long&gt; {
+    List&lt;Todo&gt; findByCompleted(boolean completed);
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>4. RESTful API 설계</h2>
+            </section>
+
+            <section>
+                <h3>4.1 REST 원칙</h3>
+                <ul>
+                    <li><strong>Stateless(무상태)</strong>: 서버가 요청 간 상태를 저장하지 않음. 각 요청이 독립적 → 서버 확장에 유리</li>
+                    <li><strong>리소스 기반 URL</strong>: /api/todos, /api/users처럼 명사로 표현</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>4.2 HTTP 메서드</h3>
+                <ul>
+                    <li><strong>GET</strong>: 리소스 조회</li>
+                    <li><strong>POST</strong>: 리소스 생성</li>
+                    <li><strong>PUT</strong>: 리소스 전체 수정</li>
+                    <li><strong>DELETE</strong>: 리소스 삭제</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>4.2 RESTful API 예시</h3>
+                <pre><code>GET    /api/todos       → 모든 Todo 조회
+GET    /api/todos/{id}  → 특정 Todo 조회
+POST   /api/todos       → Todo 생성
+PUT    /api/todos/{id}  → Todo 수정
+DELETE /api/todos/{id}  → Todo 삭제</code></pre>
+            </section>
+
+            <section>
+                <h3>4.3 @RequestBody, @PathVariable, @RequestParam</h3>
+                <pre><code class="java">@PostMapping
+public Todo create(@RequestBody Todo todo) { }
+
+@GetMapping("/{id}")
+public Todo getTodo(@PathVariable Long id) { }
+
+@GetMapping
+public List&lt;Todo&gt; getTodos(@RequestParam Boolean completed) { }</code></pre>
+            </section>
+
+            <section>
+                <h2>5. DTO (Data Transfer Object)</h2>
+                <ul>
+                    <li>계층 간 데이터 전송을 위한 객체</li>
+                    <li><strong>엔티티 노출 방지</strong>: DB 구조를 API에 직접 노출하지 않음</li>
+                    <li><strong>필요한 데이터만 전송</strong>: 민감 정보 제외, API 스펙 제어</li>
+                    <li><strong>검증 로직 추가</strong>: @Valid, @NotNull 등으로 입력 검증</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>6. 예외 처리</h2>
+                <pre><code class="java">@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(...);
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ Spring Boot 프로젝트 생성 및 실행</li>
+                    <li>✅ MVC 패턴 이해 및 구현</li>
+                    <li>✅ RESTful API 설계 및 구현</li>
+                    <li>✅ DTO를 사용한 데이터 전송</li>
+                    <li>✅ 예외 처리 방법</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>간단한 REST API 서버 만들기 (Todo CRUD)</li>
+                    <li>Postman으로 API 테스트하기</li>
+                    <li>다음 주차 준비: JPA/Hibernate 문서 읽어오기</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://spring.io/projects/spring-boot">Spring Boot 공식 문서</a></li>
+                    <li><a href="https://spring.io/guides">Spring Boot 가이드</a></li>
+                    <li><a href="https://restfulapi.net/">RESTful API 설계 가이드</a></li>
+                </ul>
+            </section>
+
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: true, transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            pdfMaxPagesPerSlide: 1, pdfSeparateFragments: false
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8주차: 배포 및 최종 프로젝트</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root { --likelion-orange: #FF6B00; --likelion-orange-light: #FF8C42; --likelion-bg: #0D0D0D; }
+        .reveal { background-color: var(--likelion-bg); }
+        .reveal .slides { background-color: var(--likelion-bg); }
+        .reveal .slides section { text-align: left; }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--likelion-orange) !important; }
+        .reveal p, .reveal li { color: #E8E8E8; }
+        .reveal .slides section.title-slide { text-align: center; }
+        .reveal .slides section.title-slide h1, .reveal .slides section.title-slide h2, .reveal .slides section.title-slide p { color: var(--likelion-orange) !important; }
+        .reveal code { background-color: #1a1a1a; color: var(--likelion-orange-light); padding: 2px 6px; border-radius: 3px; border: 1px solid #333; }
+        .reveal pre code { background-color: #1a1a1a; color: #E8E8E8; padding: 15px; border-radius: 5px; border: 1px solid #333; }
+        .reveal ul, .reveal ol { margin-left: 1.5em; }
+        .reveal .progress { color: var(--likelion-orange) !important; background: rgba(255, 107, 0, 0.2); }
+        .reveal .controls button { color: var(--likelion-orange) !important; }
+        .reveal a { color: var(--likelion-orange-light); }
+        .reveal a:hover { color: var(--likelion-orange); }
+        .reveal pre { max-height: 52vh; overflow: auto !important; margin: 0.8em 0; border-radius: 6px; }
+        .reveal pre code { font-size: 0.65em; line-height: 1.35; padding: 1rem; white-space: pre; }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide { align-items: center; }
+        .reveal strong { color: var(--likelion-orange-light); }
+        @media print { .reveal .slides section { page-break-after: always; } }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>8주차</h1>
+                <h2>배포 및 최종 프로젝트</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+                <p>React + Java Spring Boot</p>
+            </section>
+
+            <!-- 비전공자용: 빌드, 배포 쉽게 이해 -->
+            <section>
+                <h3>💡 빌드·배포, 한 줄로 말하면?</h3>
+                <ul style="font-size: 0.85em;">
+                    <li><strong>빌드</strong>: 개발자용 코드를 사용자에게 주기에 좋은 형태로 "포장"하는 것</li>
+                    <li><strong>코드 스플리팅</strong>: 필요한 것만 먼저 로드 → 첫 화면 빠르게</li>
+                    <li><strong>트리 쉐이킹</strong>: 안 쓰는 코드 제거 → 파일 크기 감소</li>
+                    <li><strong>배포</strong>: 만든 앱을 인터넷에 올려 누구나 접속 가능하게 함</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>프로젝트를 빌드하고 최적화할 수 있다</li>
+                    <li>다양한 배포 플랫폼을 이해한다</li>
+                    <li>프로젝트를 배포할 수 있다</li>
+                    <li>코드 리뷰를 할 수 있다</li>
+                    <li>최종 프로젝트를 완성하고 발표할 수 있다</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>1. 프로젝트 빌드</h2>
+            </section>
+
+            <section>
+                <h3>1.1 React 빌드</h3>
+                <pre><code class="bash">npm run build
+# build/ 폴더에 생성됨</code></pre>
+                <ul>
+                    <li><strong>코드 스플리팅</strong>: 번들을 청크로 나누어 초기 로딩 시 필요한 부분만 먼저 로드</li>
+                    <li><strong>트리 쉐이킹</strong>: import했지만 사용하지 않는 코드를 제거해 번들 크기 축소</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>1.2 Spring Boot 빌드</h3>
+                <pre><code class="bash"># Maven
+./mvnw clean package
+
+# Gradle
+./gradlew build
+
+# JAR: target/ 또는 build/libs/</code></pre>
+            </section>
+
+            <section>
+                <h2>2. 배포 옵션</h2>
+            </section>
+
+            <section>
+                <h3>2.1 프론트엔드 배포</h3>
+                <ul>
+                    <li><strong>Vercel</strong>: 가장 간단, 무료</li>
+                    <li><strong>Netlify</strong>: 정적 사이트 호스팅</li>
+                    <li><strong>AWS S3 + CloudFront</strong>: 확장성 좋음</li>
+                    <li><strong>GitHub Pages</strong>: 간단한 프로젝트용</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.2 백엔드 배포</h3>
+                <ul>
+                    <li><strong>AWS EC2</strong>: 가상 서버 (직접 관리, 유연함)</li>
+                    <li><strong>AWS Elastic Beanstalk</strong>: 간편한 배포, 자동 스케일링</li>
+                    <li><strong>Railway</strong>: 무료 티어 제공, 소규모 프로젝트에 적합</li>
+                    <li><strong>Docker + 클라우드</strong>: 환경 일관성, 마이크로서비스에 적합</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>Vercel 배포 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <code>npm run build</code> 로 빌드 확인</p>
+                <p><strong>2단계</strong>: <code>npm i -g vercel</code> 로 CLI 설치</p>
+                <p style="font-size: 0.9em;">Mac: 권한 오류 시 <code>sudo npm i -g vercel</code></p>
+                <p><strong>3단계</strong>: 프로젝트 폴더에서 <code>vercel</code> 실행</p>
+            </section>
+            <section>
+                <h3>Vercel 배포 - 따라하기 (2/2)</h3>
+                <p><strong>4단계</strong>: 로그인/가입 후 질문에 응답 (기본값 Enter)</p>
+                <p><strong>또는</strong>: vercel.com 접속 → GitHub 연결 → 저장소 선택 → 자동 배포</p>
+            </section>
+
+            <section>
+                <h3>Railway 배포 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://railway.app/" target="_blank">railway.app</a> 접속 → GitHub로 로그인</p>
+                <p><strong>2단계</strong>: New Project → Deploy from GitHub → 저장소 선택</p>
+                <p><strong>3단계</strong>: Settings → Build: <code>./mvnw clean package</code></p>
+            </section>
+            <section>
+                <h3>Railway 배포 - 따라하기 (2/2)</h3>
+                <p><strong>4단계</strong>: Start: <code>java -jar target/todo-api-0.0.1-SNAPSHOT.jar</code></p>
+                <p><strong>5단계</strong>: Variables에 DB_URL, DB_USERNAME 등 환경 변수 추가</p>
+            </section>
+
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ React/Spring Boot 빌드 방법</li>
+                    <li>✅ Vercel, Railway 등 배포 플랫폼</li>
+                    <li>✅ 환경 변수 및 프로파일 설정</li>
+                    <li>✅ 최종 프로젝트 완성 및 발표</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>Todo 앱 배포하기 (Vercel + Railway)</li>
+                    <li>최종 프로젝트 완성</li>
+                    <li>발표 자료 준비</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://vercel.com/">Vercel</a></li>
+                    <li><a href="https://railway.app/">Railway</a></li>
+                </ul>
+            </section>
+
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: true, transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            pdfMaxPagesPerSlide: 1, pdfSeparateFragments: false
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>멋쟁이사자처럼 풀스택 개발 강의</title>
+    <style>
+        :root {
+            --likelion-orange: #FF6B00;
+            --likelion-orange-light: #FF8C42;
+            --likelion-bg: #0D0D0D;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--likelion-bg);
+            min-height: 100vh;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #E8E8E8;
+            padding: 3rem 2rem;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: var(--likelion-orange);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: #888;
+            margin-bottom: 3rem;
+        }
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .week-card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-decoration: none;
+            color: #E8E8E8;
+            transition: all 0.2s;
+        }
+        .week-card:hover {
+            border-color: var(--likelion-orange);
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.2);
+        }
+        .week-card h2 {
+            color: var(--likelion-orange);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .week-card p {
+            color: #888;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>멋쟁이사자처럼</h1>
+        <p class="subtitle">풀스택 개발 강의 · React + Java Spring Boot</p>
+        
+        <div class="week-grid">
+            <a href="week01/presentation.html" class="week-card">
+                <h2>1주차</h2>
+                <p>개발 환경 설정 및 웹 개발 기초</p>
+            </a>
+            <a href="week02/presentation.html" class="week-card">
+                <h2>2주차</h2>
+                <p>React 기초</p>
+            </a>
+            <a href="week03/presentation.html" class="week-card">
+                <h2>3주차</h2>
+                <p>React 심화</p>
+            </a>
+            <a href="week04/presentation.html" class="week-card">
+                <h2>4주차</h2>
+                <p>Spring Boot 기초</p>
+            </a>
+            <a href="week05/presentation.html" class="week-card">
+                <h2>5주차</h2>
+                <p>Spring Boot 심화</p>
+            </a>
+            <a href="week06/presentation.html" class="week-card">
+                <h2>6주차</h2>
+                <p>프론트엔드-백엔드 연동</p>
+            </a>
+            <a href="week07/presentation.html" class="week-card">
+                <h2>7주차</h2>
+                <p>인증/인가 및 고급 기능</p>
+            </a>
+            <a href="week08/presentation.html" class="week-card">
+                <h2>8주차</h2>
+                <p>배포 및 최종 프로젝트</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

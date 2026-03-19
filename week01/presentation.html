@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1주차: 개발 환경 설정 및 웹 개발 기초</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    
+    <!-- Code highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root {
+            --likelion-orange: #FF6B00;
+            --likelion-orange-light: #FF8C42;
+            --likelion-bg: #0D0D0D;
+        }
+        .reveal {
+            background-color: var(--likelion-bg);
+        }
+        .reveal .slides {
+            background-color: var(--likelion-bg);
+        }
+        .reveal .slides section {
+            text-align: left;
+        }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: var(--likelion-orange) !important;
+        }
+        .reveal p, .reveal li {
+            color: #E8E8E8;
+        }
+        .reveal .slides section.title-slide {
+            text-align: center;
+        }
+        .reveal .slides section.title-slide h1,
+        .reveal .slides section.title-slide h2,
+        .reveal .slides section.title-slide p {
+            color: var(--likelion-orange) !important;
+        }
+        .reveal code {
+            background-color: #1a1a1a;
+            color: var(--likelion-orange-light);
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #333;
+        }
+        .reveal pre code {
+            background-color: #1a1a1a;
+            color: #E8E8E8;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        .reveal ul, .reveal ol {
+            margin-left: 1.5em;
+        }
+        .reveal .progress {
+            color: var(--likelion-orange) !important;
+            background: rgba(255, 107, 0, 0.2);
+        }
+        .reveal .controls button {
+            color: var(--likelion-orange) !important;
+        }
+        .reveal a {
+            color: var(--likelion-orange-light);
+        }
+        .reveal a:hover {
+            color: var(--likelion-orange);
+        }
+        /* 코드 블록 넘침 방지 */
+        .reveal pre {
+            max-height: 52vh;
+            overflow: auto !important;
+            margin: 0.8em 0;
+            border-radius: 6px;
+        }
+        .reveal pre code {
+            font-size: 0.65em;
+            line-height: 1.35;
+            padding: 1rem;
+            white-space: pre;
+        }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide {
+            align-items: center;
+        }
+        .reveal strong {
+            color: var(--likelion-orange-light);
+        }
+        @media print {
+            .reveal .slides section {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- 제목 슬라이드 -->
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>1주차</h1>
+                <h2>개발 환경 설정 및 웹 개발 기초</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+                <p>React + Java Spring Boot</p>
+            </section>
+
+            <!-- 비전공자용: 기본 용어 -->
+            <section>
+                <h3>💡 비전공자를 위한 기본 용어</h3>
+                <ul style="font-size: 0.9em;">
+                    <li><strong>터미널</strong>: 검은 화면에 글자로 명령을 입력하는 창. 마우스 말고 키보드로 조작</li>
+                    <li><strong>프론트엔드</strong>: 사용자가 보는 화면 (버튼, 폼, 레이아웃 등)</li>
+                    <li><strong>백엔드</strong>: 화면 뒤에서 데이터 처리, DB 저장, 로직 수행</li>
+                    <li><strong>API</strong>: "이렇게 요청하면 이렇게 응답할게"라는 규칙. 프로그램 간 대화 방식</li>
+                </ul>
+            </section>
+
+            <!-- 학습 목표 -->
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>개발 환경을 완전히 구축할 수 있다</li>
+                    <li>웹 개발의 기본 개념을 이해한다</li>
+                    <li>Git/GitHub를 활용할 수 있다</li>
+                    <li>프로젝트 구조를 이해한다</li>
+                </ul>
+            </section>
+
+            <!-- 1. 개발 환경 구축 -->
+            <section>
+                <h2>1. 개발 환경 구축 (60분)</h2>
+            </section>
+
+            <section>
+                <h3>1.1 Node.js 설치</h3>
+                <h4>Node.js란?</h4>
+                <p><strong>💡 한 줄 요약</strong>: 원래 브라우저 안에서만 돌아가던 JavaScript를, 컴퓨터 어디서나 실행하게 해주는 프로그램</p>
+                <ul>
+                    <li><strong>런타임</strong>: JS를 "실행해주는 환경". 브라우저 없이도 JS 코드가 돌아감</li>
+                    <li><strong>npm</strong>: 다른 사람이 만든 코드(라이브러리)를 받아 쓰는 도구. 앱스토어처럼 "패키지 설치"하는 느낌</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>Node.js 설치 방법 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://nodejs.org/ko" target="_blank">nodejs.org/ko</a> 접속</p>
+                <p><strong>2단계</strong>: <strong>LTS 버전</strong> (초록색 버튼) 다운로드 (Windows: .msi / Mac: .pkg)</p>
+            </section>
+            <section>
+                <h3>Node.js 설치 방법 - 따라하기 (2/2)</h3>
+                <p><strong>3단계</strong>: 설치 실행 → Windows: Next 반복 / Mac: 계속 → 동의 → 설치</p>
+                <p><strong>4단계</strong>: 터미널 열기 (Win+R→cmd / Mac: Cmd+Space→터미널) → 버전 확인:</p>
+                <pre><code class="bash">node --version
+npm --version</code></pre>
+                <p style="font-size: 0.85em;">✅ v18 이상 나오면 성공!</p>
+            </section>
+
+            <section>
+                <h3>1.2 Java JDK 설치</h3>
+                <h4>Java란?</h4>
+                <ul>
+                    <li>객체지향 프로그래밍 언어 → 코드를 객체 단위로 구조화</li>
+                    <li>Spring Boot는 Java 기반 → 백엔드 개발에 필수</li>
+                    <li><strong>JDK vs JRE</strong>: JDK = 개발용 (컴파일러 포함), JRE = 실행용만</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>Java JDK 설치 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://adoptium.net/ko/" target="_blank">adoptium.net/ko</a> 접속</p>
+                <p><strong>2단계</strong>: JDK 17 또는 21 LTS → <strong>Windows</strong>: .msi / <strong>Mac</strong>: .pkg 선택</p>
+                <p><strong>3단계</strong>: 설치 실행</p>
+                <ul style="font-size: 0.9em;">
+                    <li>Windows: 기본 경로 그대로</li>
+                    <li>Mac: 계속 → 동의 → 설치</li>
+                </ul>
+            </section>
+            <section>
+                <h3>Java JDK 설치 - 따라하기 (2/2)</h3>
+                <p><strong>4단계</strong>: 터미널에서 확인 (Mac: Cmd+Space → "터미널"):</p>
+                <pre><code class="bash">java -version
+javac -version</code></pre>
+                <p style="font-size: 0.85em;">✅ 버전이 나오면 성공!</p>
+            </section>
+
+            <section>
+                <h3>Java 환경 변수 (Windows)</h3>
+                <p><strong>java 명령이 안 되면</strong></p>
+                <ol style="font-size: 0.85em;">
+                    <li>Windows 검색창에 "환경 변수" 입력</li>
+                    <li>"시스템 환경 변수 편집" → "환경 변수" 클릭</li>
+                    <li>JAVA_HOME: 새로 만들기 → <code>C:\Program Files\Eclipse Adoptium\jdk-17.x.x</code></li>
+                    <li>Path 편집 → <code>%JAVA_HOME%\bin</code> 추가</li>
+                </ol>
+            </section>
+
+            <section>
+                <h3>Java 환경 변수 (Mac) (1/2)</h3>
+                <p>macOS는 보통 자동 설정. <strong>안 되면</strong>:</p>
+                <pre><code class="bash"># 터미널에서 (Cmd+Space → 터미널)
+nano ~/.zshrc</code></pre>
+                <p>아래 두 줄 추가 후 저장 (<code>Ctrl+O</code> → 엔터 → <code>Ctrl+X</code>):</p>
+                <pre><code class="bash">export JAVA_HOME=$(/usr/libexec/java_home)
+export PATH=$JAVA_HOME/bin:$PATH</code></pre>
+            </section>
+            <section>
+                <h3>Java 환경 변수 (Mac) (2/2)</h3>
+                <p>저장 후 터미널 다시 열기</p>
+                <p>또는 <code>source ~/.zshrc</code> 실행</p>
+            </section>
+
+            <section>
+                <h3>VS Code 설치 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://code.visualstudio.com/" target="_blank">code.visualstudio.com</a> → Windows/Mac 다운로드</p>
+                <p><strong>2단계</strong>: 설치 실행</p>
+                <ul style="font-size: 0.9em;">
+                    <li>Windows: "PATH에 추가" 체크</li>
+                    <li>Mac: Applications로 드래그</li>
+                </ul>
+            </section>
+            <section>
+                <h3>VS Code 설치 - 따라하기 (2/2)</h3>
+                <p><strong>3단계</strong>: 확장 탭 열기 - <strong>Ctrl+Shift+X</strong> (Windows) / <strong>Cmd+Shift+X</strong> (Mac)</p>
+                <p><strong>4단계</strong>: 확장 프로그램 검색 후 Install</p>
+            </section>
+
+            <section>
+                <h3>VS Code 필수 확장 프로그램</h3>
+                <ul style="font-size: 0.95em;">
+                    <li><strong>ES7+ React/Redux/React-Native snippets</strong> – React 코드 자동완성</li>
+                    <li><strong>Prettier</strong> – 코드 자동 포맷팅</li>
+                    <li><strong>ESLint</strong> – 코드 문법/스타일 검사</li>
+                    <li><strong>GitLens</strong> – Git 이력 확인</li>
+                </ul>
+                <p style="margin-top: 1em;">확장 검색창에 이름 입력 → Install 클릭</p>
+            </section>
+
+            <section>
+                <h3>IntelliJ IDEA 설치 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://www.jetbrains.com/idea/download/" target="_blank">jetbrains.com/idea/download</a></p>
+                <p><strong>2단계</strong>: <strong>Community</strong> 다운로드 (Windows: .exe / Mac: .dmg)</p>
+                <p><strong>3단계</strong>: 설치 (Mac: Applications로 드래그)</p>
+            </section>
+            <section>
+                <h3>IntelliJ IDEA 설치 - 따라하기 (2/2)</h3>
+                <p><strong>4단계</strong>: 실행 → Plugins → "Spring Boot" 검색 → 설치</p>
+                <p><em>설정 열기: Ctrl+Alt+S (Win) / Cmd+, (Mac)</em></p>
+            </section>
+
+            <section>
+                <h3>Git 설치 - 따라하기</h3>
+                <p><strong>1단계</strong>: <a href="https://git-scm.com/downloads" target="_blank">git-scm.com/downloads</a> 접속</p>
+                <p><strong>2단계</strong>: OS에 맞는 버전 다운로드 → 설치 (기본 옵션 그대로)</p>
+                <p><strong>3단계</strong>: 터미널에서 확인:</p>
+                <pre><code class="bash">git --version</code></pre>
+            </section>
+
+            <section>
+                <h3>Git 사용자 정보 설정 - 따라하기 (1/2)</h3>
+                <p>커밋할 때 "누가 작성했는지" 기록됩니다. <strong>한 번만</strong> 설정하면 됨</p>
+                <pre><code class="bash"># 본인 이름과 이메일로 변경해서 입력
+git config --global user.name "홍길동"
+git config --global user.email "hong@example.com"</code></pre>
+            </section>
+            <section>
+                <h3>Git 사용자 정보 설정 - 따라하기 (2/2)</h3>
+                <p><strong>확인</strong>: 아래 명령으로 user.name, user.email 보이는지 확인</p>
+                <pre><code class="bash">git config --list</code></pre>
+            </section>
+
+            <!-- 2. 웹 개발 기초 개념 -->
+            <section>
+                <h2>2. 웹 개발 기초 개념 (90분)</h2>
+            </section>
+
+            <section>
+                <h3>2.1 웹의 동작 원리</h3>
+                <h4>클라이언트-서버 모델</h4>
+                <p><strong>💡 쉬운 비유</strong>: 레스토랑에서 손님(클라이언트)=브라우저, 점원/주방(서버)=웹서버</p>
+                <ul>
+                    <li>손님이 "이 음식 주세요" → 요청(Request)</li>
+                    <li>점원이 음식 전달 → 응답(Response)</li>
+                    <li>웹: URL 입력 → 서버가 HTML/데이터 전달 → 화면에 표시</li>
+                </ul>
+            </section>
+            <section>
+                <h3>2.1 웹의 동작 원리 (계속)</h3>
+                <pre><code>브라우저(클라이언트) → HTTP 요청 → 서버
+브라우저(클라이언트) ← HTTP 응답 ← 서버</code></pre>
+            </section>
+
+            <section>
+                <h3>HTTP 프로토콜</h3>
+                <p><strong>Stateless(무상태)</strong>: 서버는 이전 요청 정보를 저장하지 않음. 각 요청을 독립적으로 처리</p>
+                <ul>
+                    <li><strong>GET</strong>: 데이터 조회 (URL 파라미터, 캐싱 가능)</li>
+                    <li><strong>POST</strong>: 데이터 생성 (요청 본문에 데이터 포함)</li>
+                    <li><strong>PUT</strong>: 리소스 전체 수정</li>
+                    <li><strong>DELETE</strong>: 리소스 삭제</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.2 HTML 기초</h3>
+                <pre><code class="html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My First Web Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Hello World&lt;/h1&gt;
+    &lt;p&gt;This is a paragraph.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </section>
+
+            <section>
+                <h3>주요 HTML 태그 (1/2)</h3>
+                <ul>
+                    <li><code>&lt;div&gt;</code>: 블록 컨테이너 (한 줄 전체 차지)</li>
+                    <li><code>&lt;span&gt;</code>: 인라인 컨테이너 (텍스트 일부만 묶음)</li>
+                    <li><code>&lt;h1&gt;</code> ~ <code>&lt;h6&gt;</code>: 제목</li>
+                    <li><code>&lt;p&gt;</code>: 문단</li>
+                </ul>
+            </section>
+            <section>
+                <h3>주요 HTML 태그 (2/2)</h3>
+                <ul>
+                    <li><code>&lt;a&gt;</code>: 링크</li>
+                    <li><code>&lt;img&gt;</code>: 이미지</li>
+                    <li><code>&lt;input&gt;</code>: 입력 필드</li>
+                    <li><code>&lt;button&gt;</code>: 버튼</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.3 CSS 기초</h3>
+                <pre><code class="css">/* 선택자 */
+h1 {
+    color: blue;
+    font-size: 24px;
+}
+
+.class-name {
+    background-color: #f0f0f0;
+}
+
+#id-name {
+    margin: 10px;
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>CSS 주요 개념</h3>
+                <ul>
+                    <li>선택자 (Selector): 스타일을 적용할 대상</li>
+                    <li>속성 (Property) / 값 (Value)</li>
+                    <li><strong>박스 모델</strong>: Margin(바깥 여백) → Border(테두리) → Padding(안쪽 여백) → Content(내용)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.4 JavaScript 기초</h3>
+                <pre><code class="javascript">// 변수 선언
+let name = "John";
+const age = 25;
+
+// 함수
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+
+// 화살표 함수
+const greetArrow = (name) => `Hello, ${name}!`;</code></pre>
+            </section>
+
+            <section>
+                <h3>JavaScript 배열과 객체</h3>
+                <pre><code class="javascript">// 배열
+const fruits = ["apple", "banana", "orange"];
+
+// 객체
+const person = {
+    name: "John",
+    age: 25,
+    greet: function() {
+        return `Hello, I'm ${this.name}`;
+    }
+};</code></pre>
+            </section>
+
+            <section>
+                <h3>ES6+ 주요 기능</h3>
+                <ul>
+                    <li>let, const</li>
+                    <li>화살표 함수</li>
+                    <li>템플릿 리터럴</li>
+                    <li>구조 분해 할당</li>
+                    <li>Promise, async/await</li>
+                </ul>
+            </section>
+
+            <!-- 3. Git/GitHub 기초 -->
+            <section>
+                <h2>3. Git/GitHub 기초 (60분)</h2>
+            </section>
+
+            <section>
+                <h3>3.1 Git 기본 명령어 (1/2)</h3>
+                <pre><code class="bash"># 저장소 초기화
+git init
+
+# 파일 추가
+git add .
+
+# 커밋
+git commit -m "Initial commit"</code></pre>
+            </section>
+            <section>
+                <h3>3.1 Git 기본 명령어 (2/2)</h3>
+                <pre><code class="bash"># 상태 확인
+git status
+
+# 변경 이력 확인
+git log</code></pre>
+            </section>
+            <section>
+                <h3>3.2 GitHub 사용법 (1/2)</h3>
+                <pre><code class="bash"># 원격 저장소 추가
+git remote add origin https://github.com/username/repo.git
+
+# 푸시
+git push -u origin main</code></pre>
+            </section>
+            <section>
+                <h3>3.2 GitHub 사용법 (2/2)</h3>
+                <pre><code class="bash"># 풀
+git pull origin main
+
+# 클론
+git clone https://github.com/username/repo.git</code></pre>
+            </section>
+
+            <section>
+                <h3>3.3 브랜치 관리</h3>
+                <p><strong>브랜치</strong>: main에서 분기된 독립 작업 공간. 기능 개발·버그 수정을 분리 후 병합</p>
+            </section>
+            <section>
+                <h3>3.3 브랜치 관리 (명령어)</h3>
+                <pre><code class="bash"># 브랜치 생성 및 이동
+git checkout -b feature/new-feature
+
+# 브랜치 목록
+git branch
+
+# 브랜치 병합
+git merge feature/new-feature</code></pre>
+            </section>
+
+            <!-- 4. 프로젝트 구조 이해 -->
+            <section>
+                <h2>4. 프로젝트 구조 이해 (30분)</h2>
+            </section>
+
+            <section>
+                <h3>4.1 프론트엔드 프로젝트 구조</h3>
+                <ul style="font-size: 0.9em;">
+                    <li><strong>components/</strong>: 재사용 UI 조각 (버튼, 카드 등)</li>
+                    <li><strong>pages/</strong>: 화면 단위 (홈, 로그인 등)</li>
+                    <li><strong>utils/</strong>: 공통 유틸 함수</li>
+                </ul>
+            </section>
+            <section>
+                <h3>4.1 프론트엔드 프로젝트 구조 (폴더 트리)</h3>
+                <pre><code>frontend/
+├── public/index.html
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── utils/
+│   ├── App.js
+│   └── index.js
+├── package.json
+└── README.md</code></pre>
+            </section>
+
+            <section>
+                <h3>4.2 백엔드 프로젝트 구조</h3>
+                <ul style="font-size: 0.9em;">
+                    <li><strong>controller/</strong>: HTTP 요청 처리</li>
+                    <li><strong>service/</strong>: 비즈니스 로직</li>
+                    <li><strong>repository/</strong>: DB 접근 (CRUD)</li>
+                    <li><strong>entity/</strong>: DB 테이블 매핑 클래스</li>
+                </ul>
+            </section>
+            <section>
+                <h3>4.2 백엔드 프로젝트 구조 (폴더 트리)</h3>
+                <pre><code>backend/
+├── src/main/java/.../controller/
+│   service/, repository/, entity/
+├── src/main/resources/
+│   application.properties
+├── src/test/
+├── pom.xml (또는 build.gradle)
+└── README.md</code></pre>
+            </section>
+
+            <!-- 5. 실습 -->
+            <section>
+                <h2>5. 실습: 첫 번째 프로젝트 생성 (30분)</h2>
+            </section>
+
+            <section>
+                <h3>5.1 React 프로젝트 생성</h3>
+                <pre><code class="bash"># Create React App 사용
+npx create-react-app my-first-app
+cd my-first-app
+npm start</code></pre>
+            </section>
+
+            <section>
+                <h3>5.2 Spring Boot 프로젝트 생성</h3>
+                <ul>
+                    <li>Spring Initializr 사용</li>
+                    <li>https://start.spring.io/</li>
+                    <li>의존성: Spring Web, Spring Data JPA, PostgreSQL Driver</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>5.3 GitHub에 업로드</h3>
+                <pre><code class="bash">git init
+git add .
+git commit -m "Initial project setup"
+git remote add origin [your-repo-url]
+git push -u origin main</code></pre>
+            </section>
+
+            <!-- 핵심 정리 -->
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ 개발 환경 구축 완료</li>
+                    <li>✅ 웹 개발 기본 개념 이해</li>
+                    <li>✅ Git/GitHub 사용법 습득</li>
+                    <li>✅ 프로젝트 구조 이해</li>
+                </ol>
+            </section>
+
+            <!-- 과제 -->
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>개인 GitHub 계정 생성 및 첫 저장소 만들기</li>
+                    <li>간단한 HTML/CSS/JavaScript 페이지 만들기</li>
+                    <li>다음 주차 준비: React 공식 문서 읽어오기</li>
+                </ol>
+            </section>
+
+            <!-- 참고 자료 -->
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://nodejs.org/">Node.js 공식 문서</a></li>
+                    <li><a href="https://www.oracle.com/java/">Java 공식 문서</a></li>
+                    <li><a href="https://git-scm.com/">Git 공식 문서</a></li>
+                    <li><a href="https://developer.mozilla.org/">MDN Web Docs</a></li>
+                </ul>
+            </section>
+
+            <!-- 마지막 슬라이드 -->
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Reveal.js JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    
+    <script>
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            pdfMaxPagesPerSlide: 1,
+            pdfSeparateFragments: false
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>
+

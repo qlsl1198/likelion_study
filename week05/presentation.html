@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5주차: Spring Boot 심화</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root { --likelion-orange: #FF6B00; --likelion-orange-light: #FF8C42; --likelion-bg: #0D0D0D; }
+        .reveal { background-color: var(--likelion-bg); }
+        .reveal .slides { background-color: var(--likelion-bg); }
+        .reveal .slides section { text-align: left; }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--likelion-orange) !important; }
+        .reveal p, .reveal li { color: #E8E8E8; }
+        .reveal .slides section.title-slide { text-align: center; }
+        .reveal .slides section.title-slide h1, .reveal .slides section.title-slide h2, .reveal .slides section.title-slide p { color: var(--likelion-orange) !important; }
+        .reveal code { background-color: #1a1a1a; color: var(--likelion-orange-light); padding: 2px 6px; border-radius: 3px; border: 1px solid #333; }
+        .reveal pre code { background-color: #1a1a1a; color: #E8E8E8; padding: 15px; border-radius: 5px; border: 1px solid #333; }
+        .reveal ul, .reveal ol { margin-left: 1.5em; }
+        .reveal .progress { color: var(--likelion-orange) !important; background: rgba(255, 107, 0, 0.2); }
+        .reveal .controls button { color: var(--likelion-orange) !important; }
+        .reveal a { color: var(--likelion-orange-light); }
+        .reveal a:hover { color: var(--likelion-orange); }
+        .reveal pre { max-height: 52vh; overflow: auto !important; margin: 0.8em 0; border-radius: 6px; }
+        .reveal pre code { font-size: 0.65em; line-height: 1.35; padding: 1rem; white-space: pre; }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide { align-items: center; }
+        .reveal strong { color: var(--likelion-orange-light); }
+        @media print { .reveal .slides section { page-break-after: always; } }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>5주차</h1>
+                <h2>Spring Boot 심화</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+                <p>React + Java Spring Boot</p>
+            </section>
+
+            <!-- 비전공자용: JPA 쉽게 이해 -->
+            <section>
+                <h3>💡 JPA, 한 줄로 말하면?</h3>
+                <p>"Java 객체 ↔ DB 테이블을 자동으로 연결해 주는 것"</p>
+                <ul style="font-size: 0.85em; margin-top: 1em;">
+                    <li><strong>JDBC</strong>: SQL을 직접 짜서 DB 접근 (번거로움)</li>
+                    <li><strong>JPA</strong>: Java 코드만 쓰면 SQL은 알아서 생성</li>
+                    <li><strong>예</strong>: <code>todoRepository.save(todo)</code> → INSERT 쿼리 자동 실행</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>JPA/Hibernate를 이해하고 사용할 수 있다</li>
+                    <li>Spring Data JPA를 활용할 수 있다</li>
+                    <li>엔티티 관계를 설계하고 매핑할 수 있다</li>
+                    <li>데이터베이스 연동을 구현할 수 있다</li>
+                    <li>쿼리 메서드를 작성할 수 있다</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>1. JPA/Hibernate 소개</h2>
+            </section>
+
+            <section>
+                <h3>1.1 JPA란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: Java 객체와 DB 간 매핑을 위한 표준</li>
+                    <li><strong>JPA vs JDBC</strong>: JDBC는 SQL 직접 작성·반복 코드多. JPA는 객체 중심, 자동 SQL 생성, 유지보수 용이</li>
+                    <li><strong>장점</strong>: 객체지향적 접근, DB 독립성, 생산성 향상</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.1 @Entity 어노테이션</h3>
+                <pre><code class="java">@Entity
+@Table(name = "todos")
+public class Todo {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, length = 100)
+    private String title;
+    
+    private boolean completed;
+    
+    @CreatedDate
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>3.1 Repository 인터페이스</h3>
+                <pre><code class="java">public interface TodoRepository extends JpaRepository&lt;Todo, Long&gt; {
+    // save, findById, findAll, deleteById 등 기본 제공
+    List&lt;Todo&gt; findByCompleted(boolean completed);
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>3.2 쿼리 메서드</h3>
+                <pre><code class="java">List&lt;Todo&gt; findByTitle(String title);
+List&lt;Todo&gt; findByCompleted(boolean completed);
+List&lt;Todo&gt; findByTitleContaining(String keyword);
+List&lt;Todo&gt; findByCompletedOrderByCreatedAtDesc(boolean completed);
+long countByCompleted(boolean completed);</code></pre>
+            </section>
+
+            <section>
+                <h3>3.3 @Query 어노테이션</h3>
+                <pre><code class="java">@Query("SELECT t FROM Todo t WHERE t.completed = :completed")
+List&lt;Todo&gt; findTodosByCompleted(@Param("completed") boolean completed);
+
+@Query(value = "SELECT * FROM todos WHERE completed = :c", nativeQuery = true)
+List&lt;Todo&gt; findNative(@Param("c") boolean completed);</code></pre>
+            </section>
+
+            <section>
+                <h3>4.1 @OneToMany / @ManyToOne</h3>
+                <pre><code class="java">// User
+@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+private List&lt;Todo&gt; todos;
+
+// Todo
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "user_id")
+private User user;</code></pre>
+            </section>
+            <section>
+                <h3>4.2 FetchType</h3>
+                <ul>
+                    <li><strong>LAZY</strong>: 필요할 때만 로딩 → N+1 주의하되 성능에 유리</li>
+                    <li><strong>EAGER</strong>: 즉시 로딩 → 불필요한 조인 발생 가능</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>PostgreSQL 설치 - 따라하기 (Windows) (1/2)</h3>
+                <p><strong>1단계</strong>: <a href="https://www.postgresql.org/download/windows/" target="_blank">postgresql.org/download/windows</a> 접속</p>
+                <p><strong>2단계</strong>: EDB Installer 다운로드 → 실행</p>
+                <p><strong>3단계</strong>: 설치 시 <strong>postgres 비밀번호</strong> 설정 (꼭 기억하기!)</p>
+            </section>
+            <section>
+                <h3>PostgreSQL 설치 - 따라하기 (Windows) (2/2)</h3>
+                <p><strong>4단계</strong>: pgAdmin 실행 → DB 생성</p>
+                <pre><code class="sql">CREATE DATABASE tododb;</code></pre>
+            </section>
+
+            <section>
+                <h3>PostgreSQL 설치 - 따라하기 (Mac) (1/2)</h3>
+                <p><strong>방법 1: Homebrew</strong> (터미널: Cmd+Space → "터미널")</p>
+                <pre><code class="bash">brew install postgresql@15
+brew services start postgresql@15</code></pre>
+            </section>
+            <section>
+                <h3>PostgreSQL 설치 - 따라하기 (Mac) (2/2)</h3>
+                <p><strong>방법 2: Postgres.app</strong> – <a href="https://postgresapp.com/" target="_blank">postgresapp.com</a> 에서 .dmg 다운로드</p>
+                <p><strong>DB 생성</strong>: <code>psql -U postgres</code> 후 <code>CREATE DATABASE tododb;</code></p>
+            </section>
+
+            <section>
+                <h3>5.1 application.properties 설정 - 따라하기</h3>
+                <p><code>src/main/resources/application.properties</code> 에 아래 내용 추가:</p>
+                <pre><code class="properties"># application.properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
+spring.datasource.username=postgres
+spring.datasource.password=yourpassword
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true</code></pre>
+            </section>
+
+            <section>
+                <h3>5.2 ddl-auto 옵션 (1/2)</h3>
+                <ul>
+                    <li><strong>create</strong>: 시작 시 테이블 생성, 종료 시 삭제 (초기화용)</li>
+                    <li><strong>update</strong>: 스키마 업데이트 (개발용 권장)</li>
+                    <li><strong>validate</strong>: 스키마 검증만 (운영용 권장)</li>
+                    <li><strong>none</strong>: 아무 작업 안 함</li>
+                </ul>
+            </section>
+            <section>
+                <h3>5.2 ddl-auto 옵션 (2/2)</h3>
+                <p><strong>운영 환경</strong>: <code>validate</code> 또는 <code>none</code> 사용</p>
+                <p><code>update</code>는 데이터 손실 위험 있음</p>
+            </section>
+
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ JPA/Hibernate 이해</li>
+                    <li>✅ 엔티티 설계 및 매핑</li>
+                    <li>✅ Spring Data JPA 활용</li>
+                    <li>✅ 엔티티 관계 매핑</li>
+                    <li>✅ 데이터베이스 연동</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>User와 Todo 관계를 가진 API 서버 만들기</li>
+                    <li>쿼리 메서드 연습</li>
+                    <li>다음 주차 준비: Axios 문서 읽어오기</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://spring.io/projects/spring-data-jpa">Spring Data JPA 공식 문서</a></li>
+                    <li><a href="https://hibernate.org/">Hibernate 공식 문서</a></li>
+                </ul>
+            </section>
+
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: true, transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            pdfMaxPagesPerSlide: 1, pdfSeparateFragments: false
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>
