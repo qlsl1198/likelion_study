@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3주차: React 심화</title>
+    
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    
+    <!-- Code highlighting -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root {
+            --likelion-orange: #FF6B00;
+            --likelion-orange-light: #FF8C42;
+            --likelion-bg: #0D0D0D;
+        }
+        .reveal {
+            background-color: var(--likelion-bg);
+        }
+        .reveal .slides {
+            background-color: var(--likelion-bg);
+        }
+        .reveal .slides section {
+            text-align: left;
+        }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: var(--likelion-orange) !important;
+        }
+        .reveal p, .reveal li {
+            color: #E8E8E8;
+        }
+        .reveal .slides section.title-slide {
+            text-align: center;
+        }
+        .reveal .slides section.title-slide h1,
+        .reveal .slides section.title-slide h2,
+        .reveal .slides section.title-slide p {
+            color: var(--likelion-orange) !important;
+        }
+        .reveal code {
+            background-color: #1a1a1a;
+            color: var(--likelion-orange-light);
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #333;
+        }
+        .reveal pre code {
+            background-color: #1a1a1a;
+            color: #E8E8E8;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+        .reveal ul, .reveal ol {
+            margin-left: 1.5em;
+        }
+        .reveal .progress {
+            color: var(--likelion-orange) !important;
+            background: rgba(255, 107, 0, 0.2);
+        }
+        .reveal .controls button {
+            color: var(--likelion-orange) !important;
+        }
+        .reveal a {
+            color: var(--likelion-orange-light);
+        }
+        .reveal a:hover {
+            color: var(--likelion-orange);
+        }
+        /* 코드 블록 넘침 방지 */
+        .reveal pre {
+            max-height: 52vh;
+            overflow: auto !important;
+            margin: 0.8em 0;
+            border-radius: 6px;
+        }
+        .reveal pre code {
+            font-size: 0.65em;
+            line-height: 1.35;
+            padding: 1rem;
+            white-space: pre;
+        }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide {
+            align-items: center;
+        }
+        .reveal strong {
+            color: var(--likelion-orange-light);
+        }
+        @media print {
+            .reveal .slides section {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- 제목 슬라이드 -->
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>3주차</h1>
+                <h2>React 심화</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+                <p>React + Java Spring Boot</p>
+            </section>
+
+            <!-- 학습 목표 -->
+            <!-- 비전공자용: Hooks, useEffect 쉽게 이해 -->
+            <section>
+                <h3>💡 useEffect, 쉽게 말하면?</h3>
+                <p>"렌더링이 끝난 뒤에 해야 할 일"</p>
+                <ul style="font-size: 0.9em; margin-top: 1em;">
+                    <li>화면 그리기(렌더링)와 무관한 작업: API 호출, 타이머, 구독 등</li>
+                    <li><strong>의존성 배열</strong>: [] = 한 번만 / [값] = 값 바뀔 때마다 / 없음 = 매번</li>
+                    <li><strong>Props drilling</strong>: 데이터를 5층 → 4층 → 3층... 내려보내야 하는 불편함. Context로 해결</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>React Hooks를 이해하고 사용할 수 있다</li>
+                    <li>useEffect를 활용하여 사이드 이펙트를 처리할 수 있다</li>
+                    <li>React Router를 사용하여 라우팅을 구현할 수 있다</li>
+                    <li>폼 처리 및 검증을 할 수 있다</li>
+                    <li>Context API를 이해한다</li>
+                </ul>
+            </section>
+
+            <!-- 1. React Hooks 소개 -->
+            <section>
+                <h2>1. React Hooks 소개 (30분)</h2>
+            </section>
+
+            <section>
+                <h3>1.1 Hooks란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: 함수형 컴포넌트에서 State와 생명주기 기능을 사용할 수 있게 해주는 함수</li>
+                    <li><strong>규칙</strong>:
+                        <ul>
+                            <li>최상위 레벨에서만 호출</li>
+                            <li>조건문, 반복문, 중첩 함수에서 호출 금지</li>
+                            <li>React 함수 컴포넌트 또는 커스텀 Hook에서만 호출</li>
+                        </ul>
+                    </li>
+                    <li><strong>이유</strong>: React가 Hook 호출 순서로 상태를 추적. 순서가 바뀌면 상태가 꼬임</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>1.2 주요 Hooks</h3>
+                <ul>
+                    <li><code>useState</code>: State 관리</li>
+                    <li><code>useEffect</code>: 사이드 이펙트 처리</li>
+                    <li><code>useContext</code>: Context 사용</li>
+                    <li><code>useRef</code>: DOM 참조 또는 값 저장</li>
+                    <li><code>useMemo</code>: 값 메모이제이션</li>
+                    <li><code>useCallback</code>: 함수 메모이제이션</li>
+                </ul>
+            </section>
+
+            <!-- 2. useEffect -->
+            <section>
+                <h2>2. useEffect (90분)</h2>
+            </section>
+
+            <section>
+                <h3>2.1 useEffect란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: 컴포넌트가 렌더링된 후 실행되는 Hook</li>
+                    <li><strong>용도</strong>: 데이터 가져오기, 구독 설정, DOM 수동 조작, 타이머 설정</li>
+                    <li><strong>의존성 배열</strong>:
+                        <ul>
+                            <li>없음: 매 렌더링마다 실행</li>
+                            <li><code>[]</code>: 마운트 시 1회만</li>
+                            <li><code>[a, b]</code>: a나 b가 바뀔 때만 실행</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.2 기본 사용법</h3>
+                <pre><code class="jsx">import { useEffect } from 'react';
+
+function Component() {
+    useEffect(() => {
+        console.log('Component mounted');
+        return () => {
+            console.log('Component unmounted');
+        };
+    });
+    return &lt;div&gt;Content&lt;/div&gt;;
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>2.3 의존성 배열</h3>
+                <ul style="font-size: 0.9em;">
+                    <li><strong>없음</strong>: 매 렌더링마다 실행</li>
+                    <li><strong>[]</strong>: 마운트 시 한 번만 (API 호출, 구독 설정 등)</li>
+                    <li><strong>[a, b]</strong>: a 또는 b가 변경될 때마다 실행</li>
+                </ul>
+            </section>
+            <section>
+                <h3>2.3 의존성 배열 - 예제</h3>
+                <pre><code class="jsx">// 매 렌더링마다 실행
+useEffect(() => { console.log('Every render'); });
+
+// 마운트 시 한 번만 실행
+useEffect(() => { console.log('Only on mount'); }, []);
+
+// 특정 값 변경 시 실행
+useEffect(() => { console.log(count); }, [count]);</code></pre>
+            </section>
+
+            <section>
+                <h3>2.4 데이터 가져오기</h3>
+                <pre><code class="jsx">function UserProfile({ userId }) {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    
+    useEffect(() => {
+        async function fetchUser() {
+            setLoading(true);
+            const response = await fetch(`/api/users/${userId}`);
+            const data = await response.json();
+            setUser(data);
+            setLoading(false);
+        }
+        fetchUser();
+    }, [userId]);
+    
+    if (loading) return &lt;div&gt;Loading...&lt;/div&gt;;
+    return &lt;div&gt;{user.name}&lt;/div&gt;;
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>2.5 클린업 함수</h3>
+                <pre><code class="jsx">function Timer() {
+    const [seconds, setSeconds] = useState(0);
+    
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setSeconds(prev =&gt; prev + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
+    
+    return &lt;div&gt;Seconds: {seconds}&lt;/div&gt;;
+}</code></pre>
+            </section>
+
+            <!-- 3. useContext -->
+            <section>
+                <h2>3. useContext (60분)</h2>
+            </section>
+
+            <section>
+                <h3>3.1 Context API란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: Props drilling을 피하기 위한 전역 상태 관리 방법</li>
+                    <li><strong>Props drilling</strong>: App → A → B → C처럼 여러 단계를 거쳐 props를 내려보내는 방식. 중간 컴포넌트는 해당 props를 사용하지도 않는데 전달만 하는 비효율 발생</li>
+                    <li><strong>Context</strong>: Provider로 감싼 영역 안의 모든 컴포넌트가 직통으로 데이터 접근</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>3.2 Context 생성 및 사용</h3>
+                <pre><code class="jsx">const ThemeContext = createContext('light');
+
+function App() {
+    const [theme, setTheme] = useState('light');
+    return (
+        &lt;ThemeContext.Provider value={{ theme, setTheme }}&gt;
+            &lt;Header /&gt;&lt;Content /&gt;
+        &lt;/ThemeContext.Provider&gt;
+    );
+}
+
+function Header() {
+    const { theme, setTheme } = useContext(ThemeContext);
+    return &lt;button onClick={() =&gt; setTheme(...)}&gt;Toggle&lt;/button&gt;;
+}</code></pre>
+            </section>
+
+            <!-- 4. React Router -->
+            <section>
+                <h2>4. React Router (90분)</h2>
+            </section>
+
+            <section>
+                <h3>4.0 React Router 설치 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: 프로젝트 폴더에서 터미널 열기</p>
+                <p><strong>2단계</strong>: 아래 명령어 실행</p>
+                <pre><code class="bash">npm install react-router-dom</code></pre>
+                <p><strong>3단계</strong>: package.json에 <code>react-router-dom</code> 추가됐는지 확인</p>
+            </section>
+            <section>
+                <h3>4.0 React Router 설치 - 따라하기 (2/2)</h3>
+                <p><strong>💡</strong> 기존 React 프로젝트가 있어야 함</p>
+                <p>없다면 1주차/2주차대로 <code>npx create-react-app</code> 먼저 실행</p>
+            </section>
+
+            <section>
+                <h3>4.1 React Router란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: React 애플리케이션에서 라우팅을 처리하는 라이브러리</li>
+                    <li><strong>설치</strong>: <code>npm install react-router-dom</code></li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>4.2 기본 설정</h3>
+                <pre><code class="jsx">import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+function App() {
+    return (
+        &lt;BrowserRouter&gt;
+            &lt;Routes&gt;
+                &lt;Route path="/" element={&lt;Home /&gt;} /&gt;
+                &lt;Route path="/about" element={&lt;About /&gt;} /&gt;
+            &lt;/Routes&gt;
+        &lt;/BrowserRouter&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>4.3 Link와 NavLink</h3>
+                <pre><code class="jsx">import { Link, NavLink } from 'react-router-dom';
+
+&lt;Link to="/"&gt;Home&lt;/Link&gt;
+&lt;NavLink to="/contact" className={({ isActive }) =&gt; isActive ? 'active' : ''}&gt;
+    Contact
+&lt;/NavLink&gt;</code></pre>
+            </section>
+
+            <section>
+                <h3>4.4 useNavigate, useParams</h3>
+                <pre><code class="jsx">// 프로그래밍 방식 이동
+const navigate = useNavigate();
+navigate('/dashboard');
+
+// URL 파라미터
+&lt;Route path="/user/:id" element={&lt;UserProfile /&gt;} /&gt;
+const { id } = useParams();</code></pre>
+            </section>
+
+            <!-- 5. 폼 처리 -->
+            <section>
+                <h2>5. 폼 처리 및 검증 (90분)</h2>
+            </section>
+
+            <section>
+                <h3>5.1 제어 컴포넌트</h3>
+                <pre><code class="jsx">function LoginForm() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    
+    return (
+        &lt;form onSubmit={(e) =&gt; { e.preventDefault(); ... }}&gt;
+            &lt;input value={email} onChange={(e) =&gt; setEmail(e.target.value)} /&gt;
+            &lt;input value={password} onChange={(e) =&gt; setPassword(e.target.value)} /&gt;
+            &lt;button type="submit"&gt;Login&lt;/button&gt;
+        &lt;/form&gt;
+    );
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>5.2 폼 검증</h3>
+                <ul>
+                    <li>validate 함수로 이메일 형식, 비밀번호 길이 등 검증</li>
+                    <li>errors 상태로 에러 메시지 저장</li>
+                    <li>handleSubmit에서 검증 후 통과 시에만 제출</li>
+                </ul>
+            </section>
+
+            <!-- 6. 실습 -->
+            <section>
+                <h2>6. 실습: Todo 리스트 앱 완성 (30분)</h2>
+                <ul>
+                    <li>React Router로 페이지 분리: <code>/</code>, <code>/about</code></li>
+                    <li>Context API로 전역 상태 관리</li>
+                    <li>useEffect로 로컬 스토리지 저장</li>
+                    <li>폼 검증 추가</li>
+                </ul>
+            </section>
+
+            <!-- 핵심 정리 -->
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ useEffect로 사이드 이펙트 처리</li>
+                    <li>✅ useContext로 전역 상태 관리</li>
+                    <li>✅ React Router로 라우팅 구현</li>
+                    <li>✅ 폼 처리 및 검증 구현</li>
+                    <li>✅ 커스텀 Hook 활용</li>
+                </ol>
+            </section>
+
+            <!-- 과제 -->
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>useEffect를 사용한 데이터 fetching 연습</li>
+                    <li>React Router로 멀티 페이지 앱 만들기</li>
+                    <li>폼 검증이 포함된 회원가입 폼 만들기</li>
+                    <li>다음 주차 준비: Spring Boot 공식 문서 읽어오기</li>
+                </ol>
+            </section>
+
+            <!-- 참고 자료 -->
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://react.dev/reference/react">React Hooks 공식 문서</a></li>
+                    <li><a href="https://reactrouter.com/">React Router 공식 문서</a></li>
+                    <li><a href="https://overreacted.io/a-complete-guide-to-useeffect/">useEffect 완벽 가이드</a></li>
+                </ul>
+            </section>
+
+            <!-- 마지막 슬라이드 -->
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <!-- Reveal.js JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    
+    <script>
+        Reveal.initialize({
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            pdfMaxPagesPerSlide: 1,
+            pdfSeparateFragments: false
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>

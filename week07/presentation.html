@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7주차: 인증/인가 및 고급 기능</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
+    
+    <style>
+        :root { --likelion-orange: #FF6B00; --likelion-orange-light: #FF8C42; --likelion-bg: #0D0D0D; }
+        .reveal { background-color: var(--likelion-bg); }
+        .reveal .slides { background-color: var(--likelion-bg); }
+        .reveal .slides section { text-align: left; }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--likelion-orange) !important; }
+        .reveal p, .reveal li { color: #E8E8E8; }
+        .reveal .slides section.title-slide { text-align: center; }
+        .reveal .slides section.title-slide h1, .reveal .slides section.title-slide h2, .reveal .slides section.title-slide p { color: var(--likelion-orange) !important; }
+        .reveal code { background-color: #1a1a1a; color: var(--likelion-orange-light); padding: 2px 6px; border-radius: 3px; border: 1px solid #333; }
+        .reveal pre code { background-color: #1a1a1a; color: #E8E8E8; padding: 15px; border-radius: 5px; border: 1px solid #333; }
+        .reveal ul, .reveal ol { margin-left: 1.5em; }
+        .reveal .progress { color: var(--likelion-orange) !important; background: rgba(255, 107, 0, 0.2); }
+        .reveal .controls button { color: var(--likelion-orange) !important; }
+        .reveal a { color: var(--likelion-orange-light); }
+        .reveal a:hover { color: var(--likelion-orange); }
+        .reveal pre { max-height: 52vh; overflow: auto !important; margin: 0.8em 0; border-radius: 6px; }
+        .reveal pre code { font-size: 0.65em; line-height: 1.35; padding: 1rem; white-space: pre; }
+        .reveal .slides section {
+            height: 100%;
+            box-sizing: border-box;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .reveal .slides section.title-slide { align-items: center; }
+        .reveal strong { color: var(--likelion-orange-light); }
+        @media print { .reveal .slides section { page-break-after: always; } }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>7주차</h1>
+                <h2>인증/인가 및 고급 기능</h2>
+                <p style="margin-top: 2em;">풀스택 개발 강의</p>
+                <p>React + Java Spring Boot</p>
+            </section>
+
+            <!-- 비전공자용: JWT 쉽게 이해 -->
+            <section>
+                <h3>💡 JWT, 한 줄로 말하면?</h3>
+                <p>"로그인 확인 증명서"</p>
+                <ul style="font-size: 0.85em; margin-top: 1em;">
+                    <li>로그인 성공 → 서버가 "이 사람 맞아" 라고 적힌 토큰 발급</li>
+                    <li>이후 요청마다 토큰을 붙여서 보냄 → 서버가 토큰만 확인 (세션 저장 불필요)</li>
+                    <li><strong>BCrypt</strong>: 비밀번호를 암호화해서 저장. 평문 저장 시 DB 털리면 모든 비번 노출</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📋 학습 목표</h2>
+                <ul>
+                    <li>JWT 기반 인증을 이해하고 구현할 수 있다</li>
+                    <li>Spring Security를 설정하고 사용할 수 있다</li>
+                    <li>React에서 인증 상태를 관리할 수 있다</li>
+                    <li>보호된 라우트를 구현할 수 있다</li>
+                    <li>파일 업로드 기능을 구현할 수 있다</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>1. JWT 인증 소개</h2>
+            </section>
+
+            <section>
+                <h3>1.1 JWT란?</h3>
+                <ul>
+                    <li><strong>정의</strong>: JSON Web Token - 인증 정보를 안전하게 전송하기 위한 토큰</li>
+                    <li><strong>Stateless</strong>: 서버에 세션 저장 불필요 → 서버 확장에 유리</li>
+                </ul>
+            </section>
+            <section>
+                <h3>1.1 JWT 구조 (계속)</h3>
+                <ul>
+                    <li><strong>Header</strong>: 알고리즘, 토큰 타입</li>
+                    <li><strong>Payload</strong>: 사용자 ID, 만료 시간 등 (암호화 X, Base64 인코딩)</li>
+                    <li><strong>Signature</strong>: 서버 비밀키로 서명 → 위변조 검증</li>
+                </ul>
+                <p style="margin-top: 1em;">형식: <code>Header.Payload.Signature</code></p>
+            </section>
+
+            <section>
+                <h3>1.2 JWT 동작 방식</h3>
+                <pre><code>1. 사용자 로그인
+2. 서버에서 JWT 생성 및 반환
+3. 클라이언트가 JWT 저장 (localStorage 등)
+4. 이후 요청에 JWT 포함 (Authorization 헤더)
+5. 서버에서 JWT 검증</code></pre>
+            </section>
+
+            <section>
+                <h3>JWT·Spring Security 의존성 추가 - 따라하기 (1/2)</h3>
+                <p><strong>1단계</strong>: IntelliJ에서 <code>pom.xml</code> 열기</p>
+                <p><strong>2단계</strong>: <code>&lt;/dependencies&gt;</code> 태그 바로 위에 추가</p>
+                <p><strong>3단계</strong>: 우클릭 → Maven → Reload project</p>
+            </section>
+            <section>
+                <h3>JWT·Spring Security 의존성 추가 - 따라하기 (2/2)</h3>
+                <p><strong>추가할 의존성</strong>:</p>
+                <ul style="font-size: 0.9em;">
+                    <li>spring-boot-starter-security</li>
+                    <li>jjwt-api, jjwt-impl, jjwt-jackson</li>
+                </ul>
+            </section>
+
+            <section>
+                <h3>2.1 Spring Security 의존성 (pom.xml)</h3>
+                <pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.jsonwebtoken&lt;/groupId&gt;
+    &lt;artifactId&gt;jjwt-api&lt;/artifactId&gt;
+    &lt;version&gt;0.11.5&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+            </section>
+
+            <section>
+                <h3>2.2 Security 설정</h3>
+                <pre><code class="java">@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        http.csrf().disable()
+            .sessionManagement().sessionCreationPolicy(STATELESS)
+            .authorizeHttpRequests()
+                .requestMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated()
+            .addFilterBefore(new JwtAuthenticationFilter(...), ...);
+        return http.build();
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h3>3. React에서 인증 처리</h3>
+                <ul>
+                    <li>로그인 시 JWT를 localStorage에 저장</li>
+                    <li>Axios 인터셉터로 요청 시 Authorization 헤더에 토큰 추가</li>
+                    <li>보호된 라우트: 인증 안 되면 로그인 페이지로 리다이렉트</li>
+                    <li><strong>BCrypt</strong>: 비밀번호를 평문이 아닌 해시로 저장. DB 유출 시에도 원본 추출 어려움</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>📝 오늘의 핵심 정리</h2>
+                <ol>
+                    <li>✅ JWT 인증 이해 및 구현</li>
+                    <li>✅ Spring Security + JWT 설정</li>
+                    <li>✅ React 인증 상태 관리</li>
+                    <li>✅ 보호된 라우트 구현</li>
+                    <li>✅ 파일 업로드</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>🏠 과제</h2>
+                <ol>
+                    <li>JWT 로그인/회원가입 구현</li>
+                    <li>보호된 라우트 적용</li>
+                    <li>다음 주차 준비: 배포 문서 읽어오기</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>📚 참고 자료</h2>
+                <ul>
+                    <li><a href="https://jwt.io/">JWT 공식 사이트</a></li>
+                    <li><a href="https://spring.io/projects/spring-security">Spring Security</a></li>
+                </ul>
+            </section>
+
+            <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>감사합니다</h1>
+                <p>질문이 있으시면 언제든지 물어보세요!</p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true, controls: true, progress: true, center: true, transition: 'slide',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            pdfMaxPagesPerSlide: 1, pdfSeparateFragments: false
+        });
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+    </script>
+</body>
+</html>
