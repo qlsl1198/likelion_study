@@ -439,19 +439,53 @@ git status
 git log</code></pre>
             </section>
             <section>
-                <h3>3.2 GitHub 사용법 (1/2)</h3>
-                <pre><code class="bash"># 원격 저장소 추가
+                <h3>3.1 (퀵 정리) add → commit → push</h3>
+                <ul style="font-size: 0.9em;">
+                    <li><code>git add</code>: 변경을 <strong>스테이징</strong>에 올림</li>
+                    <li><code>git commit</code>: 스테이징을 <strong>스냅샷</strong>으로 기록</li>
+                    <li><code>git push</code>: 커밋을 <strong>GitHub(원격)</strong>에 전송</li>
+                </ul>
+                <pre><code class="bash"># (일반 흐름)
+git status
+git add .
+git commit -m "..."
+git push</code></pre>
+                <p style="margin-top: 0.5em; font-size: 0.85em; color: #E8E8E8;">
+                    최초 1회만: <code>git push -u origin main</code>
+                </p>
+            </section>
+            <section>
+                <h3>3.2 GitHub 레포지토리 생성 - 따라하기</h3>
+                <ul>
+                    <li>GitHub → <strong>New repository</strong></li>
+                    <li><strong>Repository name</strong>: <code>likelion-study-week01</code> (예시)</li>
+                    <li><strong>Public/Private</strong> 선택</li>
+                    <li><strong>README 추가</strong>: <strong>선택하지 않음</strong></li>
+                    <li>저장소 생성 후 <strong>저장소 URL</strong> 복사</li>
+                </ul>
+            </section>
+            <section>
+                <h3>3.2 GitHub 연결 - 따라하기</h3>
+                <pre><code class="bash"># (선택) 로컬 브랜치가 master면 main으로 맞추기
+git branch -M main
+
+# 원격 저장소 연결 (URL은 GitHub에서 복사)
 git remote add origin https://github.com/username/repo.git
 
-# 푸시
+# 연결 확인
+git remote -v</code></pre>
+            </section>
+            <section>
+                <h3>3.2 GitHub 첫 푸시 - 따라하기</h3>
+                <pre><code class="bash"># 최초 푸시(업스트림 설정)
 git push -u origin main</code></pre>
             </section>
             <section>
-                <h3>3.2 GitHub 사용법 (2/2)</h3>
-                <pre><code class="bash"># 풀
+                <h3>3.2 (참고) Pull / Clone</h3>
+                <pre><code class="bash"># 원격 변경사항 가져오기 (pull)
 git pull origin main
 
-# 클론
+# 저장소 복제 (clone)
 git clone https://github.com/username/repo.git</code></pre>
             </section>
 
