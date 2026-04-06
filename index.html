@@ -233,6 +233,110 @@
             .actions { flex-direction: column; }
             .actions a { width: 100%; }
         }
+        /* 예상 질문 모달 (2주차) */
+        .btn-qna {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            padding: 0.5rem 0.85rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            border: 1px solid rgba(255, 107, 0, 0.45);
+            background: rgba(255, 107, 0, 0.12);
+            color: var(--cream);
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+        .btn-qna:hover {
+            background: rgba(255, 107, 0, 0.22);
+            border-color: rgba(255, 107, 0, 0.65);
+        }
+        .qa-modal[hidden] { display: none !important; }
+        .qa-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.25rem;
+            box-sizing: border-box;
+        }
+        .qa-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+        }
+        .qa-modal-panel {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+            max-height: min(85vh, 640px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+        }
+        .qa-modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 1rem 1.15rem;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .qa-modal-head h2 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+        }
+        .qa-modal-close {
+            flex-shrink: 0;
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--muted);
+            font-size: 1.35rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s;
+        }
+        .qa-modal-close:hover {
+            background: var(--orange-dim);
+            color: var(--cream);
+        }
+        .qa-modal-body {
+            padding: 0.85rem 1.15rem 1.15rem;
+            overflow-y: auto;
+            font-size: 0.88rem;
+            color: var(--text);
+        }
+        .qa-modal-body dl { margin: 0; }
+        .qa-modal-body dt {
+            font-weight: 700;
+            color: var(--cream);
+            margin-top: 0.9rem;
+        }
+        .qa-modal-body dt:first-child { margin-top: 0; }
+        .qa-modal-body dd {
+            margin: 0.35rem 0 0 0;
+            padding-left: 0.5rem;
+            border-left: 2px solid rgba(255, 107, 0, 0.35);
+            color: var(--muted);
+            line-height: 1.55;
+        }
     </style>
 </head>
 <body>
@@ -273,6 +377,7 @@
                 <div class="actions">
                     <a class="btn-slide" href="week02/presentation.html">슬라이드</a>
                     <a class="btn-script" href="md-viewer.html?path=week02/대본.md">강의 대본</a>
+                    <button type="button" class="btn-qna" id="open-week2-qa" aria-haspopup="dialog" aria-controls="week2-qa-modal">예상 질문</button>
                     <a class="btn-sub" href="md-viewer.html?path=week02/exercises.md">실습·과제</a>
                 </div>
             </article>
@@ -366,5 +471,67 @@
             <p>대본은 각 주차 폴더의 <code style="color: var(--cream);">대본.md</code>에서 확인하세요. Cursor·VS Code에서 미리보기로 읽기 좋습니다.</p>
         </footer>
     </div>
+
+    <!-- 2주차 예상 질문 팝업 -->
+    <div id="week2-qa-modal" class="qa-modal" role="dialog" aria-modal="true" aria-labelledby="week2-qa-title" hidden>
+        <div class="qa-modal-backdrop" data-qa-close tabindex="-1" aria-hidden="true"></div>
+        <div class="qa-modal-panel">
+            <div class="qa-modal-head">
+                <h2 id="week2-qa-title">2주차 예상 질문 · React 기초</h2>
+                <button type="button" class="qa-modal-close" data-qa-close aria-label="닫기">&times;</button>
+            </div>
+            <div class="qa-modal-body">
+                <dl>
+                    <dt>React는 프레임워크인가요, 라이브러리인가요?</dt>
+                    <dd>공식적으로는 <strong>UI를 만드는 데 집중한 자바스크립트 라이브러리</strong>로 소개됩니다. 앱 전체 구조를 모두 정하는 “풀 프레임워크”라기보다, 화면(컴포넌트) 쪽에 가깝게 쓰는 경우가 많아요.</dd>
+                    <dt>왜 HTML의 class 대신 className을 쓰나요?</dt>
+                    <dd>JSX는 자바스크립트 안에서 쓰이고, JS에서 <code style="color: var(--cream);">class</code>는 예약어라서 충돌을 피하려고 <strong>className</strong>을 씁니다.</dd>
+                    <dt>가상 DOM(Virtual DOM)이 뭔가요?</dt>
+                    <dd>브라우저가 가진 <strong>실제 DOM</strong>을 매번 통째로 바꾸지 않고, React가 메모리에 둔 <strong>가벼운 복사본</strong>끼리 비교(diff)해서 <strong>바뀐 부분만</strong> 실제 화면에 반영하려는 방식으로 이해하면 됩니다.</dd>
+                    <dt>Props와 State는 어떻게 구분하나요?</dt>
+                    <dd><strong>Props</strong>는 부모가 자식에게 넘기는 값(읽기 위주). <strong>State</strong>는 그 컴포넌트 안에서 바뀌는 데이터입니다. “버튼 눌러서 이 값이 바뀌나?” → 바뀌면 State, 부모가 정해준 고정 값이면 Props 쪽을 먼저 생각해 보세요.</dd>
+                    <dt>useState가 [값, 함수] 두 개를 주는 이유는요?</dt>
+                    <dd>첫 번째는 <strong>현재 state 값</strong>, 두 번째는 <strong>그 값을 바꿀 때만 써야 하는 setter</strong>입니다. state 변수에 직접 대입하면 React가 변경을 제대로 반영하지 못할 수 있어요.</dd>
+                    <dt>setCount(count + 1)과 setCount(prev =&gt; prev + 1) 차이는요?</dt>
+                    <dd>연속으로 여러 번 업데이트할 때는 <strong>이전 값에 기반하는 함수형 업데이트</strong>(prev =&gt; prev + 1)이 안전합니다. 한 번에 한 번만 올리면 둘 다 비슷하게 동작하는 경우가 많아요.</dd>
+                    <dt>return 안에 왜 태그를 하나의 부모로 감싸야 하나요?</dt>
+                    <dd>JSX는 <strong>하나의 루트</strong>를 반환해야 하는 규칙이 있습니다. 불필요한 div가 싫으면 <strong>Fragment</strong>(<code style="color: var(--cream);">&lt;&gt;...&lt;/&gt;</code>)로 감쌀 수 있어요.</dd>
+                    <dt>컴포넌트 이름은 왜 대문자로 시작하나요?</dt>
+                    <dd>소문자로 시작하면 <strong>HTML 태그</strong>로 해석될 수 있어요. React 컴포넌트는 <strong>대문자로 시작</strong>하는 게 규칙입니다.</dd>
+                    <dt>onClick에 왜 문자열이 아니라 함수를 넣나요?</dt>
+                    <dd>React에서는 <strong>중괄호 안에 자바스크립트 함수</strong>를 넘깁니다. DOM 옛 방식의 문자열 속성과 다릅니다.</dd>
+                    <dt>폼에서 e.preventDefault()는 왜 쓰나요?</dt>
+                    <dd>기본 제출 동작(페이지 새로고침 등)을 막고, <strong>자바스크립트로만</strong> 처리하려고 씁니다.</dd>
+                    <dt>create-react-app 말고 Vite 등 다른 도구는요?</dt>
+                    <dd>실무에서는 Vite 등을 많이 쓰기도 합니다. 강의 슬라이드는 입문용으로 CRA를 안내한 것이니, <strong>개념은 같고</strong> 도구만 다르다고 이해하시면 됩니다.</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            var modal = document.getElementById('week2-qa-modal');
+            var openBtn = document.getElementById('open-week2-qa');
+            if (!modal || !openBtn) return;
+            function openModal() {
+                modal.hidden = false;
+                document.body.style.overflow = 'hidden';
+                var closeBtn = modal.querySelector('.qa-modal-close');
+                if (closeBtn) closeBtn.focus();
+            }
+            function closeModal() {
+                modal.hidden = true;
+                document.body.style.overflow = '';
+                openBtn.focus();
+            }
+            openBtn.addEventListener('click', openModal);
+            modal.querySelectorAll('[data-qa-close]').forEach(function (el) {
+                el.addEventListener('click', closeModal);
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !modal.hidden) closeModal();
+            });
+        })();
+    </script>
 </body>
 </html>
