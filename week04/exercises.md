@@ -1,5 +1,13 @@
 # 4주차 실습 문제
 
+## 제출 (GitHub 조직)
+
+- **과제 저장소**: [likelion-session/week04-assignment](https://github.com/likelion-session/week04-assignment)  
+- **방식**: 저장소를 **Fork**한 뒤 `submissions/본인GitHub아이디/`에 코드를 넣고 **Pull Request**로 제출합니다.  
+- 상세 절차는 저장소의 [SUBMISSION.md](https://github.com/likelion-session/week04-assignment/blob/main/SUBMISSION.md)를 따릅니다.
+
+---
+
 ## 실습 1: 첫 번째 REST API 만들기 (30분)
 
 ### 목표
