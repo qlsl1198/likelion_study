@@ -1,0 +1,7 @@
+#!/bin/sh
+# Cursor 에이전트가 붙이는 공동 작성자 줄 제거 (GitHub에 본인만 표시)
+msg_file="$1"
+[ -z "$msg_file" ] || [ ! -f "$msg_file" ] && exit 0
+tmp="${msg_file}.strip"
+grep -v '^Co-authored-by: Cursor' "$msg_file" > "$tmp" && mv "$tmp" "$msg_file"
+exit 0
