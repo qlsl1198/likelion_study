@@ -293,6 +293,87 @@ DB (H2 또는 PostgreSQL)</code></pre>
             </section>
 
             <section>
+                <h2>실습 전 설치 체크리스트</h2>
+                <table>
+                    <thead>
+                        <tr><th>도구</th><th>왜 필요한가</th><th>확인 명령/방법</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Node.js</td><td>React 개발 서버 실행</td><td><code>node -v</code></td></tr>
+                        <tr><td>npm</td><td>React/Axios 패키지 설치</td><td><code>npm -v</code></td></tr>
+                        <tr><td>브라우저</td><td>React 화면 확인</td><td>Chrome 권장</td></tr>
+                        <tr><td>Postman</td><td>백엔드 API 단독 확인</td><td><code>GET /api/todos</code></td></tr>
+                        <tr><td>5주차 백엔드</td><td>React가 호출할 API</td><td><code>localhost:8080</code></td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Node.js 설치 (Windows/macOS 공통)</h2>
+                <ol>
+                    <li>브라우저에서 <a href="https://nodejs.org/">https://nodejs.org/</a> 접속</li>
+                    <li><strong>LTS</strong> 버전 다운로드</li>
+                    <li>설치 파일 실행</li>
+                    <li>설치 옵션은 기본값 유지</li>
+                    <li>설치 완료 후 터미널을 새로 열기</li>
+                </ol>
+                <div class="callout">
+                    LTS는 안정 버전입니다. 실습용으로 Current보다 LTS를 추천합니다.
+                </div>
+            </section>
+
+            <section>
+                <h2>Node.js 설치 확인</h2>
+                <p>터미널을 새로 열고 아래 명령을 실행합니다.</p>
+                <pre><code class="bash">node -v
+npm -v</code></pre>
+                <p>예시:</p>
+                <pre><code class="text">v20.11.1
+10.2.4</code></pre>
+                <p class="muted">버전 숫자가 나오면 설치 성공입니다. 숫자는 달라도 괜찮습니다.</p>
+            </section>
+
+            <section>
+                <h2>Node 명령어가 안 될 때</h2>
+                <table>
+                    <thead>
+                        <tr><th>증상</th><th>해결</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>node: command not found</code></td><td>터미널을 새로 열거나 Node.js 재설치</td></tr>
+                        <tr><td>Windows에서 인식 안 됨</td><td>설치 후 PowerShell/터미널 재시작</td></tr>
+                        <tr><td>권한 오류</td><td>프로젝트 폴더를 사용자 폴더/Desktop 아래에 생성</td></tr>
+                        <tr><td>회사/학교 PC 차단</td><td>강사에게 에러 메시지와 설치 화면 공유</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>작업 폴더 정하기</h2>
+                <p>백엔드와 프론트엔드를 헷갈리지 않도록 폴더를 분리합니다.</p>
+                <pre><code class="text">likelion-week06/
+├── todo-api/      # 5주차 Spring Boot 백엔드
+└── todo-front/    # 6주차 React 프론트엔드</code></pre>
+                <p>이미 백엔드 프로젝트가 있다면 같은 상위 폴더 옆에 <code>todo-front</code>를 만듭니다.</p>
+            </section>
+
+            <section>
+                <h2>수업 중 터미널 구분</h2>
+                <table>
+                    <thead>
+                        <tr><th>터미널</th><th>폴더</th><th>명령</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>터미널 A</td><td>Spring Boot 백엔드</td><td><code>./mvnw spring-boot:run</code></td></tr>
+                        <tr><td>터미널 B</td><td>React 프론트엔드</td><td><code>npm start</code></td></tr>
+                    </tbody>
+                </table>
+                <div class="callout">
+                    백엔드 명령을 React 폴더에서 실행하거나, npm 명령을 Spring 폴더에서 실행하면 실패합니다.
+                </div>
+            </section>
+
+            <section>
                 <h2>Lab 0. 백엔드 먼저 확인</h2>
                 <p>5주차 Spring Boot Todo API를 실행합니다.</p>
                 <pre><code class="bash">./mvnw spring-boot:run</code></pre>
@@ -352,6 +433,21 @@ public class CorsConfig {
             </section>
 
             <section>
+                <h2>CORS 포트 체크</h2>
+                <table>
+                    <thead>
+                        <tr><th>프론트 실행 주소</th><th>CORS에 넣어야 하는 값</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>http://localhost:3000</code></td><td><code>.allowedOrigins("http://localhost:3000")</code></td></tr>
+                        <tr><td><code>http://localhost:3001</code></td><td><code>.allowedOrigins("http://localhost:3001")</code></td></tr>
+                        <tr><td><code>http://localhost:5173</code></td><td><code>.allowedOrigins("http://localhost:5173")</code></td></tr>
+                    </tbody>
+                </table>
+                <p class="muted">브라우저 주소창의 origin과 Spring CORS 설정이 같아야 합니다.</p>
+            </section>
+
+            <section>
                 <h2>Lab 2. React 프로젝트 만들기</h2>
                 <p>새 폴더에서 진행합니다.</p>
                 <pre><code class="bash">npx create-react-app todo-front
@@ -359,6 +455,74 @@ cd todo-front
 npm install axios
 npm start</code></pre>
                 <p>브라우저에서 <code>http://localhost:3000</code> 이 열리면 성공입니다.</p>
+            </section>
+
+            <section>
+                <h2>React 프로젝트 만들기: 한 줄씩 실행</h2>
+                <p>한 번에 붙여넣지 말고 한 줄씩 실행합니다.</p>
+                <pre><code class="bash">npx create-react-app todo-front</code></pre>
+                <p>중간에 설치 시간이 오래 걸릴 수 있습니다. <code>Happy hacking!</code> 비슷한 메시지가 나오면 완료입니다.</p>
+                <pre><code class="bash">cd todo-front</code></pre>
+                <p>이제 터미널 위치가 React 프로젝트 안으로 들어갑니다.</p>
+            </section>
+
+            <section>
+                <h2>create-react-app 중 질문이 나오면?</h2>
+                <table>
+                    <thead>
+                        <tr><th>상황</th><th>대응</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>Need to install the following packages</code></td><td><code>y</code> 입력 후 Enter</td></tr>
+                        <tr><td>설치가 오래 걸림</td><td>멈춘 것이 아닐 수 있음. 2~3분 기다림</td></tr>
+                        <tr><td>폴더가 이미 있음</td><td>다른 이름 사용 또는 기존 폴더 삭제 전 확인</td></tr>
+                        <tr><td>권한 오류</td><td>Desktop/문서 같은 사용자 폴더에서 다시 생성</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>React 프로젝트 구조 확인</h2>
+                <p><code>todo-front</code> 폴더 안에 아래 구조가 생기면 정상입니다.</p>
+                <pre><code class="text">todo-front/
+├── package.json
+├── node_modules/
+├── public/
+└── src/
+    ├── App.js
+    ├── index.js
+    └── ...</code></pre>
+                <p class="muted"><code>node_modules</code>는 매우 크므로 GitHub에 올리지 않습니다.</p>
+            </section>
+
+            <section>
+                <h2>Axios 설치</h2>
+                <p>반드시 React 프로젝트 폴더 안에서 실행합니다.</p>
+                <pre><code class="bash">npm install axios</code></pre>
+                <p>설치 확인:</p>
+                <pre><code class="bash">npm list axios</code></pre>
+                <p>또는 <code>package.json</code>의 <code>dependencies</code>에 <code>axios</code>가 있는지 확인합니다.</p>
+            </section>
+
+            <section>
+                <h2>React 실행</h2>
+                <pre><code class="bash">npm start</code></pre>
+                <p>성공하면 브라우저가 자동으로 열립니다.</p>
+                <pre><code class="text">Local: http://localhost:3000</code></pre>
+                <p>브라우저가 안 열리면 직접 <code>http://localhost:3000</code>에 접속합니다.</p>
+            </section>
+
+            <section>
+                <h2>3000 포트가 이미 사용 중일 때</h2>
+                <p>이런 메시지가 나올 수 있습니다.</p>
+                <pre><code class="text">Something is already running on port 3000.
+Would you like to run the app on another port instead?</code></pre>
+                <p>수업에서는 가능하면 기존 React 서버를 끄고 다시 실행합니다.</p>
+                <ul>
+                    <li>기존 터미널에서 <code>Ctrl + C</code></li>
+                    <li>다시 <code>npm start</code></li>
+                    <li>다른 포트로 실행했다면 CORS 설정의 <code>allowedOrigins</code>도 수정</li>
+                </ul>
             </section>
 
             <section>
@@ -387,6 +551,29 @@ const api = axios.create({
 });
 
 export default api;</code></pre>
+            </section>
+
+            <section>
+                <h2>api 폴더 만들기</h2>
+                <p>React 프로젝트의 <code>src</code> 안에 직접 만듭니다.</p>
+                <pre><code class="text">todo-front/
+└── src/
+    ├── api/
+    │   └── axios.js
+    ├── App.js
+    └── index.js</code></pre>
+                <p class="muted">파일 이름을 <code>axios.js</code>로 만들고, import 경로는 <code>./api/axios</code>입니다.</p>
+            </section>
+
+            <section>
+                <h2>Axios 연결 확인용 임시 테스트</h2>
+                <p><code>App.js</code>를 크게 바꾸기 전, 콘솔에 찍히는지만 확인할 수 있습니다.</p>
+                <pre><code class="javascript">import api from './api/axios';
+
+api.get('/todos')
+  .then((res) => console.log(res.data))
+  .catch((err) => console.error(err));</code></pre>
+                <p>브라우저 Console에 배열이 찍히면 프론트 → 백엔드 연결이 된 것입니다.</p>
             </section>
 
             <section>
@@ -558,6 +745,24 @@ export default App;</code></pre>
             </section>
 
             <section>
+                <h2>동작 확인 성공 기준</h2>
+                <table>
+                    <thead>
+                        <tr><th>동작</th><th>Network 요청</th><th>성공 상태</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>새로고침</td><td><code>GET /api/todos</code></td><td>200</td></tr>
+                        <tr><td>추가</td><td><code>POST /api/todos</code></td><td>201</td></tr>
+                        <tr><td>완료 버튼</td><td><code>PATCH /api/todos/{id}/toggle</code></td><td>200</td></tr>
+                        <tr><td>삭제</td><td><code>DELETE /api/todos/{id}</code></td><td>204</td></tr>
+                    </tbody>
+                </table>
+                <div class="callout">
+                    화면이 바뀌었는지와 Network 요청 성공을 둘 다 확인합니다.
+                </div>
+            </section>
+
+            <section>
                 <h2>Chrome Network 탭 보기</h2>
                 <ol>
                     <li>브라우저에서 F12 또는 우클릭 → 검사</li>
@@ -620,6 +825,43 @@ GET http://localhost:8080/api/todos 200</code></pre>
                 <pre><code class="javascript">const api = axios.create({
   baseURL: 'http://localhost:8080/api',
 });</code></pre>
+            </section>
+
+            <section>
+                <h2>자주 나는 문제 4: npm install 실패</h2>
+                <table>
+                    <thead>
+                        <tr><th>증상</th><th>확인</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>npm ERR!</code>가 길게 나옴</td><td>인터넷 연결, React 프로젝트 폴더 위치 확인</td></tr>
+                        <tr><td><code>package.json</code> 없음</td><td><code>cd todo-front</code> 했는지 확인</td></tr>
+                        <tr><td>권한 오류</td><td>관리자 폴더가 아닌 사용자 폴더에서 다시 생성</td></tr>
+                        <tr><td>설치 후 import 실패</td><td><code>npm install axios</code>를 다시 실행</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>자주 나는 문제 5: 화면은 뜨는데 목록이 없음</h2>
+                <ol>
+                    <li>Network 탭에 <code>todos</code> 요청이 있는지 확인</li>
+                    <li>요청이 없다면 <code>useEffect</code> 또는 <code>load()</code> 호출 확인</li>
+                    <li>요청이 200이면 Response에 배열이 있는지 확인</li>
+                    <li>Response는 있는데 화면이 비면 <code>setItems</code>와 <code>items.map</code> 확인</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>질문할 때 필요한 정보</h2>
+                <pre><code class="text">몇 단계: 예) Axios 설치 / 목록 조회 / CORS
+현재 폴더: 예) todo-front
+실행한 명령: npm start
+브라우저 주소: http://localhost:3000
+Network Status: 404
+Console 에러:
+...</code></pre>
+                <p class="muted">이 정보가 있으면 에러 원인을 빠르게 찾을 수 있습니다.</p>
             </section>
 
             <section>
