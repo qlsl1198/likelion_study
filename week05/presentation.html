@@ -3,40 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>5주차: H2 → PostgreSQL · DB 연동 실습</title>
-    
+    <title>5주차: Spring Boot JPA 실습 - H2에서 PostgreSQL까지</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/monokai.css">
-    
+
     <style>
-        :root { --likelion-orange: #FF6B00; --likelion-orange-light: #FF8C42; --likelion-bg: #0D0D0D; }
-        .reveal { background-color: var(--likelion-bg); }
-        .reveal .slides { background-color: var(--likelion-bg); }
-        .reveal .slides section { text-align: left; }
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 { color: var(--likelion-orange) !important; }
-        .reveal p, .reveal li { color: #E8E8E8; }
-        .reveal .slides section.title-slide { text-align: center; }
-        .reveal .slides section.title-slide h1, .reveal .slides section.title-slide h2, .reveal .slides section.title-slide p { color: var(--likelion-orange) !important; }
-        .reveal code { background-color: #1a1a1a; color: var(--likelion-orange-light); padding: 2px 6px; border-radius: 3px; border: 1px solid #333; }
-        .reveal pre code { background-color: #1a1a1a; color: #E8E8E8; padding: 15px; border-radius: 5px; border: 1px solid #333; }
-        .reveal ul, .reveal ol { margin-left: 1.5em; }
-        .reveal .progress { color: var(--likelion-orange) !important; background: rgba(255, 107, 0, 0.2); }
-        .reveal .controls button { color: var(--likelion-orange) !important; }
-        .reveal a { color: var(--likelion-orange-light); }
-        .reveal a:hover { color: var(--likelion-orange); }
-        .reveal pre { max-height: 52vh; overflow: auto !important; margin: 0.8em 0; border-radius: 6px; }
-        .reveal pre code { font-size: 0.65em; line-height: 1.35; padding: 1rem; white-space: pre; }
-        .reveal .slides section {
-            height: 100%;
-            box-sizing: border-box;
-            display: flex !important;
-            flex-direction: column;
-            justify-content: center;
+        :root {
+            --likelion-orange: #FF6B00;
+            --likelion-orange-light: #FF9A3D;
+            --likelion-bg: #0D0D0D;
+            --likelion-panel: #171717;
+            --likelion-muted: #BDBDBD;
         }
-        .reveal .slides section.title-slide { align-items: center; }
-        .reveal strong { color: var(--likelion-orange-light); }
-        @media print { .reveal .slides section { page-break-after: always; } }
+
+        .reveal,
+        .reveal .slides {
+            background-color: var(--likelion-bg);
+        }
+
+        .reveal .slides section {
+            text-align: left;
+            box-sizing: border-box;
+        }
+
+        .reveal h1,
+        .reveal h2,
+        .reveal h3,
+        .reveal h4 {
+            color: var(--likelion-orange) !important;
+            letter-spacing: -0.03em;
+        }
+
+        .reveal p,
+        .reveal li,
+        .reveal td,
+        .reveal th {
+            color: #EDEDED;
+            line-height: 1.45;
+        }
+
+        .reveal small,
+        .muted {
+            color: var(--likelion-muted);
+        }
+
+        .reveal strong {
+            color: var(--likelion-orange-light);
+        }
+
+        .reveal code {
+            background-color: #1F1F1F;
+            color: var(--likelion-orange-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #333;
+        }
+
+        .reveal pre {
+            width: 100%;
+            max-height: 58vh;
+            overflow: auto !important;
+            margin: 0.6em 0;
+            border-radius: 8px;
+            border: 1px solid #333;
+            box-shadow: none;
+        }
+
+        .reveal pre code {
+            font-size: 0.62em;
+            line-height: 1.35;
+            padding: 1rem;
+            white-space: pre;
+            max-height: none;
+        }
+
+        .reveal table {
+            width: 100%;
+            font-size: 0.72em;
+            border-collapse: collapse;
+            margin: 0.7em 0;
+        }
+
+        .reveal th {
+            color: var(--likelion-orange-light);
+            border-bottom: 2px solid #444;
+        }
+
+        .reveal td,
+        .reveal th {
+            padding: 0.35em 0.45em;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .title-slide {
+            text-align: center !important;
+        }
+
+        .title-slide h1,
+        .title-slide h2,
+        .title-slide p {
+            color: var(--likelion-orange) !important;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .box {
+            background: var(--likelion-panel);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 0.8rem;
+        }
+
+        .callout {
+            border-left: 5px solid var(--likelion-orange);
+            background: rgba(255, 107, 0, 0.09);
+            padding: 0.7rem 0.9rem;
+            margin-top: 0.8rem;
+        }
+
+        .reveal .progress {
+            color: var(--likelion-orange) !important;
+            background: rgba(255, 107, 0, 0.2);
+        }
+
+        .reveal .controls button {
+            color: var(--likelion-orange) !important;
+        }
+
+        .reveal a {
+            color: var(--likelion-orange-light);
+        }
+
+        @media print {
+            .reveal .slides section {
+                page-break-after: always;
+            }
+        }
     </style>
 </head>
 <body>
@@ -44,130 +153,633 @@
         <div class="slides">
             <section class="title-slide" data-background-color="#0D0D0D">
                 <h1>5주차</h1>
-                <h2>H2 → PostgreSQL · 실습 라인</h2>
-                <p style="margin-top: 2em; font-size: 0.9em;">복붙·순서: <strong>presentation.md</strong> Lab / 상세 코드: <strong>materials.md</strong></p>
-                <p style="margin-top: 1em; font-size: 0.85em; color: #E8E8E8;">
-                    퀴즈: DB 테이블과 매핑되는 클래스에는 어떤 어노테이션? → <strong>@Entity</strong>
-                </p>
+                <h2>Spring Boot JPA 실습</h2>
+                <p style="margin-top: 1.2em;">H2에서 PostgreSQL까지</p>
+                <p class="muted" style="font-size: 0.75em;">Todo API를 실제 DB에 저장되는 API로 바꾸기</p>
             </section>
 
             <section>
-                <h2>오늘 흐름 (전원 동일)</h2>
-                <ul style="font-size: 0.9em;">
-                    <li><strong>H2 파일</strong>으로 먼저 연동 성공 · 재실행 후에도 데이터 유지</li>
-                    <li>같은 코드 · <strong>프로필만 `pg`</strong>로 PostgreSQL 에 붙여 보기</li>
-                    <li>코드 줄기: Controller → Service → <code>JpaRepository</code></li>
+                <h2>오늘 수업 목표</h2>
+                <ul>
+                    <li>4주차 Todo API를 <strong>DB 저장 API</strong>로 바꾼다.</li>
+                    <li>먼저 <strong>H2 파일 DB</strong>로 빠르게 성공시킨다.</li>
+                    <li>같은 Java 코드로 <strong>PostgreSQL</strong>에 연결한다.</li>
+                    <li>Postman으로 저장, 조회, 삭제, 검색까지 확인한다.</li>
                 </ul>
-                <p style="margin-top: 1em;"><small>Starter: Web + Data JPA + <strong>H2 + PostgreSQL Driver</strong> 동시 포함</small></p>
+                <div class="callout">
+                    핵심은 “DB 이론 암기”가 아니라 <strong>Controller → Service → Repository → DB</strong> 흐름을 직접 손으로 만드는 것입니다.
+                </div>
             </section>
 
             <section>
-                <h3>@Entity 한 줄 요약</h3>
-                <p>클래스 한 개 ≈ 표 한 줄. <code>repository.save()</code>, <code>findAll()</code> 로 CRUD 패턴 시작.</p>
+                <h2>오늘 만들 API</h2>
+                <table>
+                    <thead>
+                        <tr><th>기능</th><th>Method</th><th>URL</th><th>설명</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>목록 조회</td><td>GET</td><td><code>/api/todos</code></td><td>전체 Todo 조회</td></tr>
+                        <tr><td>단건 조회</td><td>GET</td><td><code>/api/todos/{id}</code></td><td>id로 하나 조회</td></tr>
+                        <tr><td>생성</td><td>POST</td><td><code>/api/todos</code></td><td>JSON으로 추가</td></tr>
+                        <tr><td>완료 토글</td><td>PATCH</td><td><code>/api/todos/{id}/toggle</code></td><td>완료 상태 뒤집기</td></tr>
+                        <tr><td>삭제</td><td>DELETE</td><td><code>/api/todos/{id}</code></td><td>id로 삭제</td></tr>
+                        <tr><td>검색</td><td>GET</td><td><code>/api/todos/search</code></td><td>완료 여부/제목 검색</td></tr>
+                    </tbody>
+                </table>
             </section>
 
             <section>
-                <h3>Lab 0 · 1 · 프로필</h3>
-                <pre><code class="properties"># application.properties
+                <h2>오늘 알아야 할 단어 4개</h2>
+                <table>
+                    <thead>
+                        <tr><th>단어</th><th>오늘 수업에서의 의미</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Entity</strong></td><td>Java 클래스와 DB 테이블을 연결한 것</td></tr>
+                        <tr><td><strong>Repository</strong></td><td>DB에 저장, 조회, 삭제하는 도구</td></tr>
+                        <tr><td><strong>JPA</strong></td><td>Java 객체를 DB에 넣고 빼게 해주는 방식</td></tr>
+                        <tr><td><strong>Profile</strong></td><td><code>h2</code>, <code>pg</code>처럼 실행 환경을 바꿔 끼우는 설정</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>save()가 실제로 하는 일</h2>
+                <p>우리는 Java 코드로 이렇게 씁니다.</p>
+                <pre><code class="java">todoRepository.save(todo);</code></pre>
+                <p>JPA는 내부적으로 대략 이런 SQL을 만들어 실행합니다.</p>
+                <pre><code class="sql">INSERT INTO todos (...) VALUES (...);</code></pre>
+                <p class="muted">오늘은 SQL을 직접 깊게 다루기보다, JPA가 대신 SQL을 만들어 주는 흐름을 확인합니다.</p>
+            </section>
+
+            <section>
+                <h2>전체 진행 순서</h2>
+                <table>
+                    <thead>
+                        <tr><th>순서</th><th>실습</th><th>산출물</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>1</td><td>프로젝트 준비</td><td>JPA/H2/PostgreSQL 의존성</td></tr>
+                        <tr><td>2</td><td>H2 프로필 설정</td><td>H2 Console 접속</td></tr>
+                        <tr><td>3</td><td>Entity/Repository 작성</td><td><code>todos</code> 테이블 생성</td></tr>
+                        <tr><td>4</td><td>Service/Controller 작성</td><td>CRUD API 동작</td></tr>
+                        <tr><td>5</td><td>Postman 검증</td><td>H2 저장/조회/재시작 검증</td></tr>
+                        <tr><td>6</td><td>PostgreSQL 전환</td><td><code>pg</code> 프로필 실행</td></tr>
+                        <tr><td>7</td><td>같은 API 재검증</td><td>PostgreSQL 저장 확인</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Lab 0. 프로젝트 준비</h2>
+                <p>기존 4주차 프로젝트를 사용하거나, 새로 만들 경우 Spring Initializr에서 아래 의존성을 선택합니다.</p>
+                <ul>
+                    <li>Spring Web</li>
+                    <li>Spring Data JPA</li>
+                    <li>H2 Database</li>
+                    <li>PostgreSQL Driver</li>
+                </ul>
+                <pre><code class="bash">./mvnw spring-boot:run</code></pre>
+                <p class="muted">처음에는 404가 떠도 괜찮습니다. 아직 컨트롤러를 만들지 않았기 때문입니다.</p>
+            </section>
+
+            <section>
+                <h2>pom.xml 의존성 확인</h2>
+                <pre><code class="xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+    &lt;artifactId&gt;h2&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;
+
+&lt;dependency&gt;
+    &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+    &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+&lt;/dependency&gt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Lab 1. 설정 파일 3개로 나누기</h2>
+                <pre><code class="text">src/main/resources/
+├── application.properties
+├── application-h2.properties
+└── application-pg.properties</code></pre>
+                <div class="two-col">
+                    <div class="box">
+                        <h4>공통 설정</h4>
+                        <p><code>application.properties</code></p>
+                        <p>JPA 공통 옵션과 활성 프로필</p>
+                    </div>
+                    <div class="box">
+                        <h4>환경별 설정</h4>
+                        <p><code>application-h2.properties</code></p>
+                        <p><code>application-pg.properties</code></p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>application.properties</h2>
+                <pre><code class="properties">spring.application.name=todo-db
+
+# 개발 중에는 엔티티에 맞춰 테이블을 자동 생성/수정합니다.
 spring.jpa.hibernate.ddl-auto=update
+
+# 콘솔에 SQL을 보여줍니다.
 spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# 이번 수업은 REST API라 화면 렌더링이 없습니다.
+spring.jpa.open-in-view=false
+
+# 처음에는 h2, 후반에는 pg로 바꿉니다.
 spring.profiles.active=h2</code></pre>
-                <p style="margin-top: 0.6em;"><code>application-h2.properties</code> / <code>application-pg.properties</code> 는 <strong>materials.md</strong> 블록 복사</p>
-                <p><small>H2 Console: URL 이 properties 과 <strong>완전 동일</strong>해야 접속된다</small></p>
             </section>
 
             <section>
-                <h3>Lab 2 · Todo 엔티티 (요지)</h3>
+                <h2>application-h2.properties</h2>
+                <pre><code class="properties">spring.datasource.url=jdbc:h2:file:~/likelion-todo;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+spring.datasource.username=sa
+spring.datasource.password=
+spring.datasource.driver-class-name=org.h2.Driver
+
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console</code></pre>
+                <div class="callout">
+                    <code>jdbc:h2:file</code> 방식을 쓰면 서버를 껐다 켜도 데이터가 파일에 남습니다.
+                </div>
+            </section>
+
+            <section>
+                <h2>H2: mem vs file</h2>
+                <table>
+                    <thead>
+                        <tr><th>방식</th><th>예시</th><th>특징</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>메모리</td><td><code>jdbc:h2:mem:testdb</code></td><td>서버 끄면 데이터 사라짐</td></tr>
+                        <tr><td>파일</td><td><code>jdbc:h2:file:~/likelion-todo</code></td><td>서버 꺼도 데이터 유지</td></tr>
+                    </tbody>
+                </table>
+                <p>오늘은 “재시작해도 남는지” 확인해야 하므로 <strong>파일 방식</strong>을 사용합니다.</p>
+            </section>
+
+            <section>
+                <h2>application-pg.properties</h2>
+                <pre><code class="properties">spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect</code></pre>
+                <p class="muted"><code>YOUR_PASSWORD</code>는 PostgreSQL 설치 시 정한 비밀번호로 바꿉니다.</p>
+            </section>
+
+            <section>
+                <h2>Lab 2. H2 Console 접속</h2>
+                <ol>
+                    <li>서버 실행: <code>./mvnw spring-boot:run</code></li>
+                    <li>브라우저: <code>http://localhost:8080/h2-console</code></li>
+                    <li>JDBC URL: <code>jdbc:h2:file:~/likelion-todo</code></li>
+                    <li>User Name: <code>sa</code></li>
+                    <li>Password: 비워두기</li>
+                </ol>
+                <div class="callout">
+                    URL이 설정 파일과 한 글자라도 다르면 다른 DB에 접속할 수 있습니다.
+                </div>
+            </section>
+
+            <section>
+                <h2>Lab 3. Todo 엔티티 만들기</h2>
+                <pre><code class="text">src/main/java/com/likelion/todoapi/domain/Todo.java</code></pre>
+                <p>프로젝트 패키지 이름이 다르면 <code>package</code> 줄만 본인 프로젝트에 맞춥니다.</p>
+                <pre><code class="java">package com.likelion.todoapi.domain;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;</code></pre>
+            </section>
+
+            <section>
+                <h2>Todo 엔티티 코드 (1/2)</h2>
                 <pre><code class="java">@Entity
 @Table(name = "todos")
 public class Todo {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+
+    @Column(nullable = false, length = 200)
     private String title;
-    // ...
+
+    @Column(length = 1000)
+    private String description;
+
+    private boolean completed;
+
+    private LocalDateTime createdAt;</code></pre>
+            </section>
+
+            <section>
+                <h2>Todo 엔티티 코드 (2/2)</h2>
+                <pre><code class="java">    protected Todo() {
+    }
+
+    public Todo(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.completed = false;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public boolean isCompleted() { return completed; }
+    public void setCompleted(boolean completed) { this.completed = completed; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }</code></pre>
-                <p><small>전체 클래스는 교안 또는 materials 에 있음 · 패키지만 맞추기</small></p>
             </section>
 
             <section>
-                <h3>Lab 3 · Repository</h3>
-                <pre><code class="java">public interface TodoRepository
-    extends JpaRepository&lt;Todo, Long&gt; {
+                <h2>엔티티 코드 해설</h2>
+                <table>
+                    <thead>
+                        <tr><th>코드</th><th>의미</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>@Entity</code></td><td>이 클래스를 DB 테이블과 연결</td></tr>
+                        <tr><td><code>@Table(name = "todos")</code></td><td>테이블 이름 지정</td></tr>
+                        <tr><td><code>@Id</code></td><td>기본키</td></tr>
+                        <tr><td><code>@GeneratedValue</code></td><td>id 자동 증가</td></tr>
+                        <tr><td><code>protected Todo()</code></td><td>JPA가 객체를 만들 때 필요</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Lab 4. Repository 만들기</h2>
+                <pre><code class="java">package com.likelion.todoapi.domain;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface TodoRepository extends JpaRepository&lt;Todo, Long&gt; {
+
+    List&lt;Todo&gt; findByCompleted(boolean completed);
+
+    List&lt;Todo&gt; findByTitleContainingIgnoreCase(String keyword);
 }</code></pre>
-                <p>이름 규칙으로 확장 가능: <code>findByCompleted</code>, <code>findByTitleContainingIgnoreCase</code></p>
             </section>
 
             <section>
-                <h3>Lab 4 · Service + Controller</h3>
-                <p>지난주 메모리 <code>List</code> 자리를 <strong><code>todoRepository.save</code></strong> 로 교체 한 그림이라고 안내하면 충분</p>
+                <h2>JpaRepository가 주는 기본 기능</h2>
+                <table>
+                    <thead>
+                        <tr><th>메서드</th><th>역할</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>findAll()</code></td><td>전체 조회</td></tr>
+                        <tr><td><code>findById(id)</code></td><td>id로 단건 조회</td></tr>
+                        <tr><td><code>save(todo)</code></td><td>저장 또는 수정</td></tr>
+                        <tr><td><code>deleteById(id)</code></td><td>id로 삭제</td></tr>
+                        <tr><td><code>count()</code></td><td>개수 조회</td></tr>
+                    </tbody>
+                </table>
             </section>
 
             <section>
-                <h3>Lab 5 · Postman 체크 (H2)</h3>
-                <ol style="font-size: 0.92em;">
-                    <li>GET 목록 빈 배열</li>
-                    <li>POST 한 건</li>
-                    <li>GET 목록에 보임</li>
-                    <li><strong>서버 재시작</strong> 후 GET 여전히 존재 (파일 DB)</li>
+                <h2>쿼리 메서드 이름 규칙</h2>
+                <pre><code class="java">List&lt;Todo&gt; findByCompleted(boolean completed);</code></pre>
+                <p>Spring Data JPA는 메서드 이름을 읽고 이런 SQL에 가까운 쿼리를 만듭니다.</p>
+                <pre><code class="sql">SELECT * FROM todos WHERE completed = ?;</code></pre>
+                <pre><code class="java">List&lt;Todo&gt; findByTitleContainingIgnoreCase(String keyword);</code></pre>
+                <p class="muted">제목에 특정 단어가 포함된 Todo를 대소문자 구분 없이 찾습니다.</p>
+            </section>
+
+            <section>
+                <h2>Lab 5. Service 만들기 (1/3)</h2>
+                <pre><code class="java">package com.likelion.todoapi.service;
+
+import com.likelion.todoapi.domain.Todo;
+import com.likelion.todoapi.domain.TodoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+public class TodoService {
+
+    private final TodoRepository todoRepository;
+
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }</code></pre>
+            </section>
+
+            <section>
+                <h2>Service 만들기 (2/3)</h2>
+                <pre><code class="java">    public List&lt;Todo&gt; getAll() {
+        return todoRepository.findAll();
+    }
+
+    public Todo get(Long id) {
+        return todoRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public Todo create(String title, String description) {
+        Todo todo = new Todo(title, description);
+        return todoRepository.save(todo);
+    }</code></pre>
+            </section>
+
+            <section>
+                <h2>Service 만들기 (3/3)</h2>
+                <pre><code class="java">    @Transactional
+    public Todo toggleCompleted(Long id) {
+        Todo todo = todoRepository.findById(id).orElseThrow();
+        todo.setCompleted(!todo.isCompleted());
+        return todo;
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        todoRepository.deleteById(id);
+    }
+
+    public List&lt;Todo&gt; getByCompleted(boolean completed) {
+        return todoRepository.findByCompleted(completed);
+    }
+
+    public List&lt;Todo&gt; searchByTitle(String keyword) {
+        return todoRepository.findByTitleContainingIgnoreCase(keyword);
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>@Transactional은 언제 붙이나?</h2>
+                <ul>
+                    <li><code>create</code>: DB에 새 행을 저장함</li>
+                    <li><code>toggleCompleted</code>: 기존 행의 값을 바꿈</li>
+                    <li><code>delete</code>: 행을 삭제함</li>
+                </ul>
+                <div class="callout">
+                    DB 데이터를 바꾸는 메서드에는 우선 <code>@Transactional</code>을 붙인다고 기억하면 됩니다.
+                </div>
+            </section>
+
+            <section>
+                <h2>Lab 6. Controller 만들기 (1/4)</h2>
+                <pre><code class="java">package com.likelion.todoapi.controller;
+
+import com.likelion.todoapi.domain.Todo;
+import com.likelion.todoapi.service.TodoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    private final TodoService todoService;</code></pre>
+            </section>
+
+            <section>
+                <h2>Controller 만들기 (2/4)</h2>
+                <pre><code class="java">    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
+    }
+
+    @GetMapping
+    public List&lt;Todo&gt; list() {
+        return todoService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public Todo one(@PathVariable Long id) {
+        return todoService.get(id);
+    }</code></pre>
+            </section>
+
+            <section>
+                <h2>Controller 만들기 (3/4)</h2>
+                <pre><code class="java">    @PostMapping
+    public ResponseEntity&lt;Todo&gt; create(@RequestBody Map&lt;String, String&gt; body) {
+        String title = body.getOrDefault("title", "").trim();
+        String description = body.getOrDefault("description", "");
+
+        if (title.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Todo saved = todoService.create(title, description);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @PatchMapping("/{id}/toggle")
+    public Todo toggle(@PathVariable Long id) {
+        return todoService.toggleCompleted(id);
+    }</code></pre>
+            </section>
+
+            <section>
+                <h2>Controller 만들기 (4/4)</h2>
+                <pre><code class="java">    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; remove(@PathVariable Long id) {
+        todoService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public List&lt;Todo&gt; search(
+        @RequestParam(required = false) Boolean completed,
+        @RequestParam(required = false) String keyword
+    ) {
+        if (completed != null) return todoService.getByCompleted(completed);
+        if (keyword != null && !keyword.isBlank()) return todoService.searchByTitle(keyword);
+        return todoService.getAll();
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Lab 7. Postman: H2 검증 순서</h2>
+                <ol>
+                    <li><code>GET /api/todos</code> → 처음에는 <code>[]</code></li>
+                    <li><code>POST /api/todos</code> → Todo 하나 생성</li>
+                    <li><code>GET /api/todos</code> → 목록에 생성한 Todo 확인</li>
+                    <li>서버 종료 후 재실행</li>
+                    <li><code>GET /api/todos</code> → 데이터가 그대로 있는지 확인</li>
                 </ol>
             </section>
 
             <section>
-                <h3>Lab 6 · PostgreSQL 준비</h3>
-                <p><a href="https://www.postgresql.org/download/" target="_blank">postgresql.org/download</a></p>
+                <h2>Postman 생성 요청</h2>
+                <pre><code class="http">POST http://localhost:8080/api/todos
+Content-Type: application/json</code></pre>
+                <pre><code class="json">{
+  "title": "JPA 실습하기",
+  "description": "H2에서 먼저 저장해보기"
+}</code></pre>
+                <p>응답 상태가 <code>201 Created</code>이면 생성 성공입니다.</p>
+            </section>
+
+            <section>
+                <h2>Postman 추가 요청</h2>
+                <table>
+                    <thead>
+                        <tr><th>기능</th><th>요청</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>단건 조회</td><td><code>GET /api/todos/1</code></td></tr>
+                        <tr><td>완료 토글</td><td><code>PATCH /api/todos/1/toggle</code></td></tr>
+                        <tr><td>완료 검색</td><td><code>GET /api/todos/search?completed=true</code></td></tr>
+                        <tr><td>제목 검색</td><td><code>GET /api/todos/search?keyword=JPA</code></td></tr>
+                        <tr><td>삭제</td><td><code>DELETE /api/todos/1</code></td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Lab 8. PostgreSQL 준비</h2>
+                <p>공식 다운로드: <a href="https://www.postgresql.org/download/">postgresql.org/download</a></p>
+                <table>
+                    <thead>
+                        <tr><th>OS</th><th>추천</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Windows</td><td>PostgreSQL 공식 Installer + pgAdmin</td></tr>
+                        <tr><td>macOS</td><td>Postgres.app 또는 Homebrew</td></tr>
+                    </tbody>
+                </table>
                 <pre><code class="sql">CREATE DATABASE tododb;</code></pre>
-                <p><small>비밀번호는 <code>application-pg.properties</code> 에만 · Git 커밋 주의</small></p>
             </section>
 
             <section>
-                <h3>Lab 6 · 프로필 전환 한 줄</h3>
+                <h2>Lab 9. PostgreSQL로 전환</h2>
+                <p><code>application-pg.properties</code>에서 비밀번호를 수정합니다.</p>
+                <pre><code class="properties">spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
+spring.datasource.username=postgres
+spring.datasource.password=설치할때정한비밀번호
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect</code></pre>
+            </section>
+
+            <section>
+                <h2>프로필 한 줄만 바꾸기</h2>
+                <p><code>application.properties</code>에서:</p>
                 <pre><code class="properties">spring.profiles.active=pg</code></pre>
-                <p>Java 코드 수정 없음 · 같은 <code>/api/todos</code> 재검증</p>
-                <p style="margin-top: 0.5em;"><small>데이터는 H2 → PG 자동 이전 안 됨 · 새 POST 하면 된다</small></p>
+                <p>서버 재실행:</p>
+                <pre><code class="bash">./mvnw spring-boot:run</code></pre>
+                <div class="callout">
+                    Java 코드는 수정하지 않습니다. 바뀐 것은 DB 연결 설정뿐입니다.
+                </div>
             </section>
 
             <section>
-                <h3>실패 시 순서 디버깅</h3>
-                <ul style="font-size: 0.9em;">
-                    <li>H2 URL 한 글자라도 다른지</li>
-                    <li>PG: 비번·포트·DB 미생성</li>
-                    <li><code>@SpringBootApplication</code> 과 같은 패키지 트리에 Repository 있는지</li>
-                </ul>
+                <h2>PostgreSQL 검증</h2>
+                <p>H2 때와 같은 URL을 다시 호출합니다.</p>
+                <ol>
+                    <li><code>GET /api/todos</code></li>
+                    <li><code>POST /api/todos</code></li>
+                    <li><code>GET /api/todos</code></li>
+                    <li><code>PATCH /api/todos/{id}/toggle</code></li>
+                    <li><code>GET /api/todos/search?completed=true</code></li>
+                    <li><code>DELETE /api/todos/{id}</code></li>
+                </ol>
+                <p class="muted">H2 데이터가 PostgreSQL로 자동 복사되지는 않습니다. PostgreSQL에서 새로 POST합니다.</p>
             </section>
 
             <section>
-                <h2>📝 과제</h2>
+                <h2>자주 나는 오류</h2>
+                <table>
+                    <thead>
+                        <tr><th>증상</th><th>확인할 것</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>H2 Console 접속 실패</td><td>JDBC URL 문자열 일치 여부</td></tr>
+                        <tr><td>테이블이 안 생김</td><td><code>@Entity</code>, 패키지 위치</td></tr>
+                        <tr><td><code>No qualifying bean</code></td><td>Repository/Service가 앱 루트 밖인지</td></tr>
+                        <tr><td><code>Connection refused</code></td><td>PostgreSQL 서버 실행 여부</td></tr>
+                        <tr><td>비밀번호 실패</td><td><code>application-pg.properties</code> 오타</td></tr>
+                        <tr><td>DB 없음</td><td><code>CREATE DATABASE tododb;</code> 실행 여부</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>오늘 핵심 정리</h2>
+                <ol>
+                    <li><code>@Entity</code>를 만들면 테이블과 연결된다.</li>
+                    <li><code>JpaRepository</code>를 상속하면 기본 CRUD가 생긴다.</li>
+                    <li>H2는 빠른 연습용으로 좋다.</li>
+                    <li>PostgreSQL은 실제 서비스와 더 가까운 DB다.</li>
+                    <li>Spring Profile을 쓰면 같은 코드로 DB를 바꿔 끼울 수 있다.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>과제 안내</h2>
                 <ul>
-                    <li><strong>1단계:</strong> H2 증명 (재시작 후 유지 포함)</li>
-                    <li><strong>2단계:</strong> PostgreSQL 증명 (동일 API)</li>
-                    <li><strong>자세히:</strong> <code>exercises.md</code></li>
+                    <li><strong>1단계:</strong> H2에서 Todo API 동작 + 재시작 후 데이터 유지 증명</li>
+                    <li><strong>2단계:</strong> PostgreSQL로 전환 후 같은 API 동작 증명</li>
+                    <li><strong>3단계 이후:</strong> 검색, <code>@Query</code>, 관계 매핑 등 추가 실습</li>
                 </ul>
+                <p class="muted">실제 DB 비밀번호가 GitHub에 올라가지 않도록 주의합니다.</p>
             </section>
 
             <section class="title-slide" data-background-color="#0D0D0D">
                 <h1>다음 주</h1>
-                <p style="margin-top: 1em;">React + Axios 로 이 API 연결 · <strong>CORS</strong></p>
+                <p>React + Axios로 오늘 만든 Todo API 호출하기</p>
+                <p class="muted">CORS, API 호출, 로딩/에러 상태</p>
             </section>
 
             <section class="title-slide" data-background-color="#0D0D0D">
                 <h1>감사합니다</h1>
-                <p>질문이 있으시면 물어보세요!</p>
+                <p>질문이 있으면 지금 바로 같이 봅시다.</p>
             </section>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/notes/notes.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/markdown/markdown.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/plugin/highlight/highlight.js"></script>
     <script>
         Reveal.initialize({
-            hash: true, controls: true, progress: true, center: true, transition: 'slide',
-            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
-            pdfMaxPagesPerSlide: 1, pdfSeparateFragments: false
+            hash: true,
+            controls: true,
+            progress: true,
+            center: true,
+            transition: 'slide',
+            plugins: [RevealHighlight, RevealNotes],
+            pdfMaxPagesPerSlide: 1,
+            pdfSeparateFragments: false
         });
-        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(a) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); });
+
+        document.querySelectorAll('.reveal a[href^="http"]').forEach(function(anchor) {
+            anchor.setAttribute('target', '_blank');
+            anchor.setAttribute('rel', 'noopener');
+        });
     </script>
 </body>
 </html>

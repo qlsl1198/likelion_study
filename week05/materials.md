@@ -1,21 +1,30 @@
-# 5주차 보조 자료 (복붙용 치트시트)
+# 5주차 보조 자료 — H2 → PostgreSQL DB 연동 치트시트
 
-교안 순서는 **`presentation.md`** Lab 번호이다. 여기에는 **설정 세트 + 전체 클래스**를 길게 둔다.
+이 파일은 수업 중 막혔을 때 빠르게 복사하거나 확인하는 자료입니다. 강의 흐름은 `presentation.md`를 기준으로 합니다.
 
 ---
 
-## Maven 의존성 (Starter에 빠졌을 때만)
+## 1. 프로젝트 의존성
+
+Spring Initializr에서 넣으면 `pom.xml`에 자동으로 들어갑니다. 빠졌다면 아래 의존성을 추가합니다.
 
 ```xml
 <dependency>
     <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
 </dependency>
+
 <dependency>
     <groupId>com.h2database</groupId>
     <artifactId>h2</artifactId>
     <scope>runtime</scope>
 </dependency>
+
 <dependency>
     <groupId>org.postgresql</groupId>
     <artifactId>postgresql</artifactId>
@@ -25,54 +34,82 @@
 
 ---
 
-## 프로필 3종 (한 세트 그대로 복사)
+## 2. 설정 파일 세트
 
-**`application.properties`**
+### `application.properties`
 
 ```properties
 spring.application.name=todo-db
+
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
 spring.jpa.open-in-view=false
 
-# 수업 순서: 먼저 h2 → Lab 6 이후 pg
 spring.profiles.active=h2
 ```
 
-**`application-h2.properties`**
+### `application-h2.properties`
 
 ```properties
 spring.datasource.url=jdbc:h2:file:~/likelion-todo;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
 spring.datasource.username=sa
 spring.datasource.password=
 spring.datasource.driver-class-name=org.h2.Driver
+
 spring.h2.console.enabled=true
 spring.h2.console.path=/h2-console
 ```
 
-**`application-pg.properties`**
+### `application-pg.properties`
 
 ```properties
 spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
 spring.datasource.username=postgres
-spring.datasource.password=여기실제비번
+spring.datasource.password=여기실제비밀번호
 spring.datasource.driver-class-name=org.postgresql.Driver
+
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
-PostgreSQL 전환 요약:
+### 프로필 전환
 
-1. `CREATE DATABASE tododb;`
-2. 위 비번 수정
-3. `spring.profiles.active=pg` 로 변경 후 재실행
+```properties
+spring.profiles.active=h2
+```
 
-다시 H2만 쓰려면 → `spring.profiles.active=h2`.
+또는
+
+```properties
+spring.profiles.active=pg
+```
 
 ---
 
-## `Todo.java` 전체 예시
+## 3. 파일 구조 예시
 
-`package` 는 본인 프로젝트에 맞출 것.
+```text
+src/main/java/com/likelion/todoapi/
+├── TodoApiApplication.java
+├── controller/
+│   └── TodoController.java
+├── domain/
+│   ├── Todo.java
+│   └── TodoRepository.java
+└── service/
+    └── TodoService.java
+
+src/main/resources/
+├── application.properties
+├── application-h2.properties
+└── application-pg.properties
+```
+
+패키지명은 본인 프로젝트에 맞춥니다. 중요한 것은 `TodoApiApplication` 아래 하위 패키지에 controller/domain/service가 있어야 자동 스캔된다는 점입니다.
+
+---
+
+## 4. `Todo.java`
 
 ```java
 package com.likelion.todoapi.domain;
@@ -98,7 +135,8 @@ public class Todo {
 
     private LocalDateTime createdAt;
 
-    protected Todo() {}
+    protected Todo() {
+    }
 
     public Todo(String title, String description) {
         this.title = title;
@@ -107,20 +145,43 @@ public class Todo {
         this.createdAt = LocalDateTime.now();
     }
 
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public boolean isCompleted() { return completed; }
-    public void setCompleted(boolean completed) { this.completed = completed; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 }
 ```
 
 ---
 
-## `TodoRepository.java`
+## 5. `TodoRepository.java`
 
 ```java
 package com.likelion.todoapi.domain;
@@ -139,7 +200,7 @@ public interface TodoRepository extends JpaRepository<Todo, Long> {
 
 ---
 
-## `TodoService.java`
+## 6. `TodoService.java`
 
 ```java
 package com.likelion.todoapi.service;
@@ -164,13 +225,21 @@ public class TodoService {
         return todoRepository.findAll();
     }
 
-    @Transactional
-    public Todo create(String title, String description) {
-        return todoRepository.save(new Todo(title, description));
-    }
-
     public Todo get(Long id) {
         return todoRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public Todo create(String title, String description) {
+        Todo todo = new Todo(title, description);
+        return todoRepository.save(todo);
+    }
+
+    @Transactional
+    public Todo toggleCompleted(Long id) {
+        Todo todo = todoRepository.findById(id).orElseThrow();
+        todo.setCompleted(!todo.isCompleted());
+        return todo;
     }
 
     @Transactional
@@ -178,15 +247,19 @@ public class TodoService {
         todoRepository.deleteById(id);
     }
 
-    public List<Todo> getByCompleted(boolean done) {
-        return todoRepository.findByCompleted(done);
+    public List<Todo> getByCompleted(boolean completed) {
+        return todoRepository.findByCompleted(completed);
+    }
+
+    public List<Todo> searchByTitle(String keyword) {
+        return todoRepository.findByTitleContainingIgnoreCase(keyword);
     }
 }
 ```
 
 ---
 
-## `TodoController.java`
+## 7. `TodoController.java`
 
 ```java
 package com.likelion.todoapi.controller;
@@ -215,17 +288,27 @@ public class TodoController {
         return todoService.getAll();
     }
 
+    @GetMapping("/{id}")
+    public Todo one(@PathVariable Long id) {
+        return todoService.get(id);
+    }
+
     @PostMapping
     public ResponseEntity<Todo> create(@RequestBody Map<String, String> body) {
-        String title = body.getOrDefault("title", "제목없음");
+        String title = body.getOrDefault("title", "").trim();
         String description = body.getOrDefault("description", "");
+
+        if (title.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         Todo saved = todoService.create(title, description);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    @GetMapping("/{id}")
-    public Todo one(@PathVariable Long id) {
-        return todoService.get(id);
+    @PatchMapping("/{id}/toggle")
+    public Todo toggle(@PathVariable Long id) {
+        return todoService.toggleCompleted(id);
     }
 
     @DeleteMapping("/{id}")
@@ -235,33 +318,155 @@ public class TodoController {
     }
 
     @GetMapping("/search")
-    public List<Todo> byCompleted(@RequestParam boolean completed) {
-        return todoService.getByCompleted(completed);
+    public List<Todo> search(
+        @RequestParam(required = false) Boolean completed,
+        @RequestParam(required = false) String keyword
+    ) {
+        if (completed != null) {
+            return todoService.getByCompleted(completed);
+        }
+
+        if (keyword != null && !keyword.isBlank()) {
+            return todoService.searchByTitle(keyword);
+        }
+
+        return todoService.getAll();
     }
 }
 ```
 
 ---
 
-## PostgreSQL 만들기 한 줄
+## 8. Postman 요청 모음
+
+### 전체 조회
+
+```http
+GET http://localhost:8080/api/todos
+```
+
+### 생성
+
+```http
+POST http://localhost:8080/api/todos
+Content-Type: application/json
+```
+
+```json
+{
+  "title": "JPA 실습하기",
+  "description": "H2에서 PostgreSQL까지 연결"
+}
+```
+
+### 단건 조회
+
+```http
+GET http://localhost:8080/api/todos/1
+```
+
+### 완료 토글
+
+```http
+PATCH http://localhost:8080/api/todos/1/toggle
+```
+
+### 완료 여부 검색
+
+```http
+GET http://localhost:8080/api/todos/search?completed=true
+```
+
+```http
+GET http://localhost:8080/api/todos/search?completed=false
+```
+
+### 제목 검색
+
+```http
+GET http://localhost:8080/api/todos/search?keyword=JPA
+```
+
+### 삭제
+
+```http
+DELETE http://localhost:8080/api/todos/1
+```
+
+---
+
+## 9. PostgreSQL 명령
+
+### DB 생성
 
 ```sql
 CREATE DATABASE tododb;
 ```
 
+### psql 접속 예시
+
+macOS/Homebrew 환경 예시:
+
+```bash
+psql postgres
+```
+
+비밀번호 사용자 접속 예시:
+
+```bash
+psql -U postgres
+```
+
+### 테이블 확인 예시
+
+```sql
+\c tododb
+\dt
+select * from todos;
+```
+
 ---
 
-## 자주 나는 문제
+## 10. 오류 대응표
 
-| 증상 | 점검 |
-|------|------|
-| H2 Console 연결 불가 | JDBC URL 과 `properties` 문자열 동일 여부 |
-| pg 전환 후 기동 실패 | 비번·포트 5432·DB 이름 오타 |
-| 빈 실행은 되는데 API 404 | `@SpringBootApplication` 패키지와 Controller 패키지 위치 |
-| 8080 충돌 | `server.port=8081` |
+| 증상 | 확인할 것 |
+|------|-----------|
+| H2 Console 접속 실패 | JDBC URL이 `jdbc:h2:file:~/likelion-todo`와 같은지 |
+| 테이블이 안 생김 | `@Entity`가 붙었는지, 패키지 스캔 범위 안인지 |
+| `No qualifying bean` | Repository/Service 패키지가 앱 루트 밖인지 |
+| `Connection refused` | PostgreSQL 서버가 실행 중인지 |
+| `password authentication failed` | `application-pg.properties` 비밀번호 오타 |
+| `database "tododb" does not exist` | `CREATE DATABASE tododb;` 실행 여부 |
+| `Port 8080 already in use` | 기존 서버 종료 또는 `server.port=8081` |
 
 ---
 
-## 심화만 참고 (공식 문서)
+## 11. 제출 전 체크
 
-- [Spring Data JPA — Query methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)
+- H2 상태에서 POST/GET 캡처
+- H2 서버 재시작 후 데이터 유지 캡처 또는 설명
+- `pg` 프로필로 전환한 상태에서 POST/GET 캡처
+- 실제 DB 비밀번호가 GitHub에 올라가지 않았는지 확인
+
+---
+
+## 12. 더 해보고 싶은 사람
+
+### `@Query` 예시
+
+```java
+@Query("select t from Todo t where t.completed = false order by t.createdAt desc")
+List<Todo> findLatestUncompletedTodos();
+```
+
+### BaseEntity 아이디어
+
+`createdAt`, `updatedAt`을 여러 엔티티가 공유할 때 부모 클래스로 뺄 수 있습니다.
+
+```java
+@MappedSuperclass
+public abstract class BaseEntity {
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+}
+```
