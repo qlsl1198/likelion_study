@@ -1,212 +1,267 @@
-# 5주차 보조 자료
+# 5주차 보조 자료 (복붙용 치트시트)
 
-## 엔티티 설계 가이드
+교안 순서는 **`presentation.md`** Lab 번호이다. 여기에는 **설정 세트 + 전체 클래스**를 길게 둔다.
 
-### 네이밍 전략
-```java
-@Entity
-@Table(name = "todo_items")  // 테이블 이름 명시
-public class Todo {
-    @Column(name = "todo_title")  // 컬럼 이름 명시
-    private String title;
-}
-```
+---
 
-### 기본값 설정
-```java
-@Entity
-public class Todo {
-    @Column(columnDefinition = "boolean default false")
-    private boolean completed;
-    
-    @Column(columnDefinition = "varchar(100) default 'Untitled'")
-    private String title;
-}
-```
+## Maven 의존성 (Starter에 빠졌을 때만)
 
-## 복합 키 사용
-
-### @EmbeddedId 사용
-```java
-@Embeddable
-public class OrderItemId implements Serializable {
-    private Long orderId;
-    private Long itemId;
-}
-
-@Entity
-public class OrderItem {
-    @EmbeddedId
-    private OrderItemId id;
-    
-    private int quantity;
-}
-```
-
-## 쿼리 메서드 키워드
-
-### 주요 키워드
-- `findBy`, `readBy`, `getBy`: 조회
-- `countBy`: 개수
-- `existsBy`: 존재 여부
-- `deleteBy`, `removeBy`: 삭제
-
-### 조건 키워드
-- `And`, `Or`: 논리 연산
-- `Is`, `Equals`: 같음
-- `IsNot`, `Not`: 같지 않음
-- `IsNull`, `IsNotNull`: NULL 체크
-- `Like`, `NotLike`: 패턴 매칭
-- `StartingWith`, `EndingWith`, `Containing`: 문자열 검색
-- `LessThan`, `LessThanEqual`: 미만, 이하
-- `GreaterThan`, `GreaterThanEqual`: 초과, 이상
-- `Between`: 범위
-- `In`: 포함
-- `OrderBy`: 정렬
-
-### 예시
-```java
-List<Todo> findByTitleContainingAndCompletedOrderByCreatedAtDesc(
-    String keyword, 
-    boolean completed
-);
-
-long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
-
-List<Todo> findByIdIn(List<Long> ids);
-```
-
-## 트랜잭션 관리
-
-### @Transactional
-```java
-@Service
-@Transactional
-public class TodoService {
-    public Todo createTodo(Todo todo) {
-        // 자동으로 트랜잭션 시작
-        Todo saved = todoRepository.save(todo);
-        // 커밋 또는 롤백
-        return saved;
-    }
-    
-    @Transactional(readOnly = true)
-    public List<Todo> getAllTodos() {
-        // 읽기 전용 트랜잭션
-        return todoRepository.findAll();
-    }
-}
-```
-
-## 엔티티 이벤트
-
-### @PrePersist, @PreUpdate
-```java
-@Entity
-public class Todo {
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
-    
-    @PreUpdate
-    public void preUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-}
-```
-
-## N+1 문제 해결
-
-### 문제 상황
-```java
-// User를 조회할 때마다 Todo도 조회됨 (N+1 문제)
-List<User> users = userRepository.findAll();
-for (User user : users) {
-    System.out.println(user.getTodos().size());  // 각각 쿼리 실행
-}
-```
-
-### 해결 방법 1: Fetch Join
-```java
-@Query("SELECT u FROM User u JOIN FETCH u.todos")
-List<User> findAllWithTodos();
-```
-
-### 해결 방법 2: @EntityGraph
-```java
-@EntityGraph(attributePaths = {"todos"})
-List<User> findAll();
-```
-
-## 커스텀 Repository
-
-### 인터페이스 정의
-```java
-public interface TodoRepositoryCustom {
-    List<Todo> findCustomTodos(String keyword);
-}
-```
-
-### 구현 클래스
-```java
-@Repository
-public class TodoRepositoryCustomImpl implements TodoRepositoryCustom {
-    @PersistenceContext
-    private EntityManager entityManager;
-    
-    @Override
-    public List<Todo> findCustomTodos(String keyword) {
-        // 커스텀 로직 구현
-        return entityManager.createQuery(...).getResultList();
-    }
-}
-```
-
-### 메인 Repository에 상속
-```java
-public interface TodoRepository extends JpaRepository<Todo, Long>, TodoRepositoryCustom {
-    // ...
-}
-```
-
-## Specification 사용
-
-### 의존성 추가
 ```xml
 <dependency>
-    <groupId>org.springframework.data</groupId>
-    <artifactId>spring-data-jpa</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>com.h2database</groupId>
+    <artifactId>h2</artifactId>
+    <scope>runtime</scope>
+</dependency>
+<dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
 </dependency>
 ```
 
-### Repository 수정
+---
+
+## 프로필 3종 (한 세트 그대로 복사)
+
+**`application.properties`**
+
+```properties
+spring.application.name=todo-db
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.open-in-view=false
+
+# 수업 순서: 먼저 h2 → Lab 6 이후 pg
+spring.profiles.active=h2
+```
+
+**`application-h2.properties`**
+
+```properties
+spring.datasource.url=jdbc:h2:file:~/likelion-todo;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+spring.datasource.username=sa
+spring.datasource.password=
+spring.datasource.driver-class-name=org.h2.Driver
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+
+**`application-pg.properties`**
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
+spring.datasource.username=postgres
+spring.datasource.password=여기실제비번
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
+
+PostgreSQL 전환 요약:
+
+1. `CREATE DATABASE tododb;`
+2. 위 비번 수정
+3. `spring.profiles.active=pg` 로 변경 후 재실행
+
+다시 H2만 쓰려면 → `spring.profiles.active=h2`.
+
+---
+
+## `Todo.java` 전체 예시
+
+`package` 는 본인 프로젝트에 맞출 것.
+
 ```java
-public interface TodoRepository extends JpaRepository<Todo, Long>, JpaSpecificationExecutor<Todo> {
+package com.likelion.todoapi.domain;
+
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "todos")
+public class Todo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length = 200)
+    private String title;
+
+    @Column(length = 1000)
+    private String description;
+
+    private boolean completed;
+
+    private LocalDateTime createdAt;
+
+    protected Todo() {}
+
+    public Todo(String title, String description) {
+        this.title = title;
+        this.description = description;
+        this.completed = false;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public boolean isCompleted() { return completed; }
+    public void setCompleted(boolean completed) { this.completed = completed; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }
 ```
 
-### 사용
+---
+
+## `TodoRepository.java`
+
 ```java
+package com.likelion.todoapi.domain;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface TodoRepository extends JpaRepository<Todo, Long> {
+
+    List<Todo> findByCompleted(boolean completed);
+
+    List<Todo> findByTitleContainingIgnoreCase(String keyword);
+}
+```
+
+---
+
+## `TodoService.java`
+
+```java
+package com.likelion.todoapi.service;
+
+import com.likelion.todoapi.domain.Todo;
+import com.likelion.todoapi.domain.TodoRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 @Service
 public class TodoService {
-    public List<Todo> searchTodos(String keyword, Boolean completed) {
-        Specification<Todo> spec = Specification.where(null);
-        
-        if (keyword != null) {
-            spec = spec.and((root, query, cb) -> 
-                cb.like(root.get("title"), "%" + keyword + "%")
-            );
-        }
-        
-        if (completed != null) {
-            spec = spec.and((root, query, cb) -> 
-                cb.equal(root.get("completed"), completed)
-            );
-        }
-        
-        return todoRepository.findAll(spec);
+
+    private final TodoRepository todoRepository;
+
+    public TodoService(TodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
+    }
+
+    public List<Todo> getAll() {
+        return todoRepository.findAll();
+    }
+
+    @Transactional
+    public Todo create(String title, String description) {
+        return todoRepository.save(new Todo(title, description));
+    }
+
+    public Todo get(Long id) {
+        return todoRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        todoRepository.deleteById(id);
+    }
+
+    public List<Todo> getByCompleted(boolean done) {
+        return todoRepository.findByCompleted(done);
     }
 }
 ```
 
+---
+
+## `TodoController.java`
+
+```java
+package com.likelion.todoapi.controller;
+
+import com.likelion.todoapi.domain.Todo;
+import com.likelion.todoapi.service.TodoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/todos")
+public class TodoController {
+
+    private final TodoService todoService;
+
+    public TodoController(TodoService todoService) {
+        this.todoService = todoService;
+    }
+
+    @GetMapping
+    public List<Todo> list() {
+        return todoService.getAll();
+    }
+
+    @PostMapping
+    public ResponseEntity<Todo> create(@RequestBody Map<String, String> body) {
+        String title = body.getOrDefault("title", "제목없음");
+        String description = body.getOrDefault("description", "");
+        Todo saved = todoService.create(title, description);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    @GetMapping("/{id}")
+    public Todo one(@PathVariable Long id) {
+        return todoService.get(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remove(@PathVariable Long id) {
+        todoService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public List<Todo> byCompleted(@RequestParam boolean completed) {
+        return todoService.getByCompleted(completed);
+    }
+}
+```
+
+---
+
+## PostgreSQL 만들기 한 줄
+
+```sql
+CREATE DATABASE tododb;
+```
+
+---
+
+## 자주 나는 문제
+
+| 증상 | 점검 |
+|------|------|
+| H2 Console 연결 불가 | JDBC URL 과 `properties` 문자열 동일 여부 |
+| pg 전환 후 기동 실패 | 비번·포트 5432·DB 이름 오타 |
+| 빈 실행은 되는데 API 404 | `@SpringBootApplication` 패키지와 Controller 패키지 위치 |
+| 8080 충돌 | `server.port=8081` |
+
+---
+
+## 심화만 참고 (공식 문서)
+
+- [Spring Data JPA — Query methods](https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html)

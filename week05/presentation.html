@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>5주차: Spring Boot 심화</title>
+    <title>5주차: H2 → PostgreSQL · DB 연동 실습</title>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/black.css">
@@ -44,197 +44,115 @@
         <div class="slides">
             <section class="title-slide" data-background-color="#0D0D0D">
                 <h1>5주차</h1>
-                <h2>Spring Boot 심화</h2>
-                <p style="margin-top: 2em;">풀스택 개발 강의</p>
-                <p style="margin-top: 1.2em; font-size: 0.85em; color: #E8E8E8;">
-                    CS/풀스택 퀴즈(단답): JPA에서 DB 테이블과 매핑되는 클래스에 붙이는 어노테이션은?
+                <h2>H2 → PostgreSQL · 실습 라인</h2>
+                <p style="margin-top: 2em; font-size: 0.9em;">복붙·순서: <strong>presentation.md</strong> Lab / 상세 코드: <strong>materials.md</strong></p>
+                <p style="margin-top: 1em; font-size: 0.85em; color: #E8E8E8;">
+                    퀴즈: DB 테이블과 매핑되는 클래스에는 어떤 어노테이션? → <strong>@Entity</strong>
                 </p>
-                <p>React + Java Spring Boot</p>
             </section>
 
-            <!-- 비전공자용: JPA 쉽게 이해 -->
             <section>
-                <h3>💡 JPA, 한 줄로 말하면?</h3>
-                <p>"Java 객체 ↔ DB 테이블을 자동으로 연결해 주는 것"</p>
-                <ul style="font-size: 0.85em; margin-top: 1em;">
-                    <li><strong>JDBC</strong>: SQL을 직접 짜서 DB 접근 (번거로움)</li>
-                    <li><strong>JPA</strong>: Java 코드만 쓰면 SQL은 알아서 생성</li>
-                    <li><strong>예</strong>: <code>todoRepository.save(todo)</code> → INSERT 쿼리 자동 실행</li>
+                <h2>오늘 흐름 (전원 동일)</h2>
+                <ul style="font-size: 0.9em;">
+                    <li><strong>H2 파일</strong>으로 먼저 연동 성공 · 재실행 후에도 데이터 유지</li>
+                    <li>같은 코드 · <strong>프로필만 `pg`</strong>로 PostgreSQL 에 붙여 보기</li>
+                    <li>코드 줄기: Controller → Service → <code>JpaRepository</code></li>
                 </ul>
+                <p style="margin-top: 1em;"><small>Starter: Web + Data JPA + <strong>H2 + PostgreSQL Driver</strong> 동시 포함</small></p>
             </section>
 
             <section>
-                <h2>📋 학습 목표</h2>
-                <ul>
-                    <li>JPA/Hibernate를 이해하고 사용할 수 있다</li>
-                    <li>Spring Data JPA를 활용할 수 있다</li>
-                    <li>엔티티 관계를 설계하고 매핑할 수 있다</li>
-                    <li>데이터베이스 연동을 구현할 수 있다</li>
-                    <li>쿼리 메서드를 작성할 수 있다</li>
-                </ul>
+                <h3>@Entity 한 줄 요약</h3>
+                <p>클래스 한 개 ≈ 표 한 줄. <code>repository.save()</code>, <code>findAll()</code> 로 CRUD 패턴 시작.</p>
             </section>
 
             <section>
-                <h2>1. JPA/Hibernate 소개</h2>
+                <h3>Lab 0 · 1 · 프로필</h3>
+                <pre><code class="properties"># application.properties
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.profiles.active=h2</code></pre>
+                <p style="margin-top: 0.6em;"><code>application-h2.properties</code> / <code>application-pg.properties</code> 는 <strong>materials.md</strong> 블록 복사</p>
+                <p><small>H2 Console: URL 이 properties 과 <strong>완전 동일</strong>해야 접속된다</small></p>
             </section>
 
             <section>
-                <h3>1.1 JPA란?</h3>
-                <ul>
-                    <li><strong>정의</strong>: Java 객체와 DB 간 매핑을 위한 표준</li>
-                    <li><strong>JPA vs JDBC</strong>: JDBC는 SQL 직접 작성·반복 코드多. JPA는 객체 중심, 자동 SQL 생성, 유지보수 용이</li>
-                    <li><strong>장점</strong>: 객체지향적 접근, DB 독립성, 생산성 향상</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>2.1 @Entity 어노테이션</h3>
+                <h3>Lab 2 · Todo 엔티티 (요지)</h3>
                 <pre><code class="java">@Entity
 @Table(name = "todos")
 public class Todo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false)
     private String title;
-    
-    private boolean completed;
-    
-    @CreatedDate
-    private LocalDateTime createdAt;
-    
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+    // ...
 }</code></pre>
+                <p><small>전체 클래스는 교안 또는 materials 에 있음 · 패키지만 맞추기</small></p>
             </section>
 
             <section>
-                <h3>3.1 Repository 인터페이스</h3>
-                <pre><code class="java">public interface TodoRepository extends JpaRepository&lt;Todo, Long&gt; {
-    // save, findById, findAll, deleteById 등 기본 제공
-    List&lt;Todo&gt; findByCompleted(boolean completed);
+                <h3>Lab 3 · Repository</h3>
+                <pre><code class="java">public interface TodoRepository
+    extends JpaRepository&lt;Todo, Long&gt; {
 }</code></pre>
+                <p>이름 규칙으로 확장 가능: <code>findByCompleted</code>, <code>findByTitleContainingIgnoreCase</code></p>
             </section>
 
             <section>
-                <h3>3.2 쿼리 메서드</h3>
-                <pre><code class="java">List&lt;Todo&gt; findByTitle(String title);
-List&lt;Todo&gt; findByCompleted(boolean completed);
-List&lt;Todo&gt; findByTitleContaining(String keyword);
-List&lt;Todo&gt; findByCompletedOrderByCreatedAtDesc(boolean completed);
-long countByCompleted(boolean completed);</code></pre>
+                <h3>Lab 4 · Service + Controller</h3>
+                <p>지난주 메모리 <code>List</code> 자리를 <strong><code>todoRepository.save</code></strong> 로 교체 한 그림이라고 안내하면 충분</p>
             </section>
 
             <section>
-                <h3>3.3 @Query 어노테이션</h3>
-                <pre><code class="java">@Query("SELECT t FROM Todo t WHERE t.completed = :completed")
-List&lt;Todo&gt; findTodosByCompleted(@Param("completed") boolean completed);
-
-@Query(value = "SELECT * FROM todos WHERE completed = :c", nativeQuery = true)
-List&lt;Todo&gt; findNative(@Param("c") boolean completed);</code></pre>
+                <h3>Lab 5 · Postman 체크 (H2)</h3>
+                <ol style="font-size: 0.92em;">
+                    <li>GET 목록 빈 배열</li>
+                    <li>POST 한 건</li>
+                    <li>GET 목록에 보임</li>
+                    <li><strong>서버 재시작</strong> 후 GET 여전히 존재 (파일 DB)</li>
+                </ol>
             </section>
 
             <section>
-                <h3>4.1 @OneToMany / @ManyToOne</h3>
-                <pre><code class="java">// User
-@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-private List&lt;Todo&gt; todos;
-
-// Todo
-@ManyToOne(fetch = FetchType.LAZY)
-@JoinColumn(name = "user_id")
-private User user;</code></pre>
-            </section>
-            <section>
-                <h3>4.2 FetchType</h3>
-                <ul>
-                    <li><strong>LAZY</strong>: 필요할 때만 로딩 → N+1 주의하되 성능에 유리</li>
-                    <li><strong>EAGER</strong>: 즉시 로딩 → 불필요한 조인 발생 가능</li>
-                </ul>
-            </section>
-
-            <section>
-                <h3>PostgreSQL 설치 - 따라하기 (Windows) (1/2)</h3>
-                <p><strong>1단계</strong>: <a href="https://www.postgresql.org/download/windows/" target="_blank">postgresql.org/download/windows</a> 접속</p>
-                <p><strong>2단계</strong>: EDB Installer 다운로드 → 실행</p>
-                <p><strong>3단계</strong>: 설치 시 <strong>postgres 비밀번호</strong> 설정 (꼭 기억하기!)</p>
-            </section>
-            <section>
-                <h3>PostgreSQL 설치 - 따라하기 (Windows) (2/2)</h3>
-                <p><strong>4단계</strong>: pgAdmin 실행 → DB 생성</p>
+                <h3>Lab 6 · PostgreSQL 준비</h3>
+                <p><a href="https://www.postgresql.org/download/" target="_blank">postgresql.org/download</a></p>
                 <pre><code class="sql">CREATE DATABASE tododb;</code></pre>
+                <p><small>비밀번호는 <code>application-pg.properties</code> 에만 · Git 커밋 주의</small></p>
             </section>
 
             <section>
-                <h3>PostgreSQL 설치 - 따라하기 (Mac) (1/2)</h3>
-                <p><strong>방법 1: Homebrew</strong> (터미널: Cmd+Space → "터미널")</p>
-                <pre><code class="bash">brew install postgresql@15
-brew services start postgresql@15</code></pre>
-            </section>
-            <section>
-                <h3>PostgreSQL 설치 - 따라하기 (Mac) (2/2)</h3>
-                <p><strong>방법 2: Postgres.app</strong> – <a href="https://postgresapp.com/" target="_blank">postgresapp.com</a> 에서 .dmg 다운로드</p>
-                <p><strong>DB 생성</strong>: <code>psql -U postgres</code> 후 <code>CREATE DATABASE tododb;</code></p>
+                <h3>Lab 6 · 프로필 전환 한 줄</h3>
+                <pre><code class="properties">spring.profiles.active=pg</code></pre>
+                <p>Java 코드 수정 없음 · 같은 <code>/api/todos</code> 재검증</p>
+                <p style="margin-top: 0.5em;"><small>데이터는 H2 → PG 자동 이전 안 됨 · 새 POST 하면 된다</small></p>
             </section>
 
             <section>
-                <h3>5.1 application.properties 설정 - 따라하기</h3>
-                <p><code>src/main/resources/application.properties</code> 에 아래 내용 추가:</p>
-                <pre><code class="properties"># application.properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
-spring.datasource.username=postgres
-spring.datasource.password=yourpassword
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true</code></pre>
-            </section>
-
-            <section>
-                <h3>5.2 ddl-auto 옵션 (1/2)</h3>
-                <ul>
-                    <li><strong>create</strong>: 시작 시 테이블 생성, 종료 시 삭제 (초기화용)</li>
-                    <li><strong>update</strong>: 스키마 업데이트 (개발용 권장)</li>
-                    <li><strong>validate</strong>: 스키마 검증만 (운영용 권장)</li>
-                    <li><strong>none</strong>: 아무 작업 안 함</li>
+                <h3>실패 시 순서 디버깅</h3>
+                <ul style="font-size: 0.9em;">
+                    <li>H2 URL 한 글자라도 다른지</li>
+                    <li>PG: 비번·포트·DB 미생성</li>
+                    <li><code>@SpringBootApplication</code> 과 같은 패키지 트리에 Repository 있는지</li>
                 </ul>
             </section>
-            <section>
-                <h3>5.2 ddl-auto 옵션 (2/2)</h3>
-                <p><strong>운영 환경</strong>: <code>validate</code> 또는 <code>none</code> 사용</p>
-                <p><code>update</code>는 데이터 손실 위험 있음</p>
-            </section>
 
             <section>
-                <h2>📝 오늘의 핵심 정리</h2>
-                <ol>
-                    <li>✅ JPA/Hibernate 이해</li>
-                    <li>✅ 엔티티 설계 및 매핑</li>
-                    <li>✅ Spring Data JPA 활용</li>
-                    <li>✅ 엔티티 관계 매핑</li>
-                    <li>✅ 데이터베이스 연동</li>
-                </ol>
-            </section>
-
-            <section>
-                <h2>🏠 과제</h2>
-                <ol>
-                    <li>User와 Todo 관계를 가진 API 서버 만들기</li>
-                    <li>쿼리 메서드 연습</li>
-                    <li>다음 주차 준비: Axios 문서 읽어오기</li>
-                </ol>
-            </section>
-
-            <section>
-                <h2>📚 참고 자료</h2>
+                <h2>📝 과제</h2>
                 <ul>
-                    <li><a href="https://spring.io/projects/spring-data-jpa">Spring Data JPA 공식 문서</a></li>
-                    <li><a href="https://hibernate.org/">Hibernate 공식 문서</a></li>
+                    <li><strong>1단계:</strong> H2 증명 (재시작 후 유지 포함)</li>
+                    <li><strong>2단계:</strong> PostgreSQL 증명 (동일 API)</li>
+                    <li><strong>자세히:</strong> <code>exercises.md</code></li>
                 </ul>
             </section>
 
             <section class="title-slide" data-background-color="#0D0D0D">
+                <h1>다음 주</h1>
+                <p style="margin-top: 1em;">React + Axios 로 이 API 연결 · <strong>CORS</strong></p>
+            </section>
+
+            <section class="title-slide" data-background-color="#0D0D0D">
                 <h1>감사합니다</h1>
-                <p>질문이 있으시면 언제든지 물어보세요!</p>
+                <p>질문이 있으시면 물어보세요!</p>
             </section>
         </div>
     </div>

@@ -1,371 +1,153 @@
-# 5주차: Spring Boot 심화
+# 5주차: H2부터 PostgreSQL까지 — DB 연동 실습 한 줄 코스
 
-## 📋 학습 목표
-- JPA/Hibernate를 이해하고 사용할 수 있다
-- Spring Data JPA를 활용할 수 있다
-- 엔티티 관계를 설계하고 매핑할 수 있다
-- 데이터베이스 연동을 구현할 수 있다
-- 쿼리 메서드를 작성할 수 있다
+**이번 주는 같은 코드**를 **먼저 H2**에서 돌린 뒤, **PostgreSQL로 옮겨 보는 과정**까지 한 번에 갑니다. 이론은 아래 표 두 줄만 읽고 **Lab 순서대로 따라 치면** 됩니다.
 
----
+| 단어 | 이렇게만 기억 |
+|------|----------------|
+| `@Entity` 붙인 클래스 | DB에 만들어지는 **표 한 장**과 연결된다 |
+| `JpaRepository` | `save`, `findAll` 같은 기능이 인터페이스에 **이미 포함**된다 |
 
-## 1. JPA/Hibernate 소개 (30분)
-
-### 1.1 JPA란?
-- **정의**: Java Persistence API - Java 객체와 데이터베이스 간 매핑을 위한 표준
-- **💡 비전공자를 위한 한 줄**: "DB를 Java 객체처럼 다루게 해주는 도구. SQL을 직접 쓰지 않고 `save()`, `find()` 같은 메서드로 처리"
-- **장점**:
-  - 객체지향적 접근
-  - 데이터베이스 독립성
-  - 생산성 향상
-
-### 1.2 Hibernate란?
-- **정의**: JPA 구현체 중 하나
-- **기능**: 객체-관계 매핑 (ORM)
-
-### 1.3 JPA vs JDBC
-- **JDBC (Java Database Connectivity)**:
-  - SQL을 직접 문자열로 작성해야 함
-  - ResultSet을 객체로 변환하는 반복 코드 필요
-  - 데이터베이스마다 SQL 문법 차이 대응이 수동
-- **JPA**:
-  - Java 객체를 다루듯 DB를 조작 (예: `repository.save(todo)`)
-  - SQL 생성과 객체 매핑을 JPA가 자동 처리
-  - Hibernate가 MySQL, PostgreSQL, Oracle 등 다양한 DB 방언(Dialect) 지원
-  - ** trade-off**: 복잡한 쿼리는 JPQL 또는 네이티브 SQL로 직접 작성 필요
+**오늘 목표**: 4주차 API에 저장소를 붙인다 → **재시작해도 데이터 유지**(H2 파일) → **같은 API가 PostgreSQL에서도 동작**한다.
 
 ---
 
-## 2. 엔티티 설계 (90분)
+## 수업·실습 순서 (전원 동일 루트)
 
-### 2.1 @Entity 어노테이션
-```java
-@Entity
-@Table(name = "todos")
-public class Todo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, length = 100)
-    private String title;
-    
-    @Column(length = 500)
-    private String description;
-    
-    private boolean completed;
-    
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-    
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-    
-    // 생성자, getter, setter
-}
-```
+| 순서 | 내용 |
+|------|------|
+| 【Lab 0】 프로젝트 의존성 (H2 + PostgreSQL 드라이버 둘 다) |
+| 【Lab 1】 **프로필로 H2** 연결 · H2 Console 확인 |
+| 【Lab 2】 `Todo` 엔티티 |
+| 【Lab 3】 `TodoRepository` |
+| 【Lab 4】 `TodoService` + `TodoController` |
+| 【Lab 5】 Postman으로 저장·목록·재실행 검증 (**H2**) |
+| 【Lab 6】 **PostgreSQL 설치 요약 · DB 생성 · 프로필을 `pg`로 전환** |
+| 【Lab 7】 Postman으로 **같은 API** 재검증 + (시간 되면) `findBy…` 라우트 |
+| 【Lab 8·선택】 쿼리 메서드·`@Query`·관계 매핑 등 — `exercises.md` 참고 |
 
-### 2.2 주요 어노테이션
-- `@Entity`: 엔티티 클래스
-- `@Table`: 테이블 이름 지정
-- `@Id`: 기본 키
-- `@GeneratedValue`: 자동 생성 전략
-- `@Column`: 컬럼 속성 지정
-- `@CreatedDate`: 생성 시간 자동 설정
-- `@LastModifiedDate`: 수정 시간 자동 설정
-
-### 2.3 생성 전략
-```java
-@GeneratedValue(strategy = GenerationType.IDENTITY)  // MySQL, PostgreSQL
-@GeneratedValue(strategy = GenerationType.SEQUENCE)  // Oracle
-@GeneratedValue(strategy = GenerationType.TABLE)    // 모든 DB
-@GeneratedValue(strategy = GenerationType.AUTO)      // 자동 선택
-```
-
-### 2.4 BaseEntity 생성
-```java
-@MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
-public abstract class BaseEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-    
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-    
-    // getter, setter
-}
-
-// 사용
-@Entity
-public class Todo extends BaseEntity {
-    private String title;
-    // ...
-}
-```
+복붙용 설정·코드 블록은 **`materials.md`** 에 더 길게 정리되어 있다.
 
 ---
 
-## 3. Spring Data JPA (90분)
+## 【Lab 0】 준비 (약 10분)
 
-### 3.1 Repository 인터페이스
-```java
-public interface TodoRepository extends JpaRepository<Todo, Long> {
-    // 기본 메서드 제공:
-    // - save(T entity)
-    // - findById(ID id)
-    // - findAll()
-    // - deleteById(ID id)
-    // - count()
-    // 등등...
-}
+- **4주차 프로젝트**가 있으면 연다.
+- 새로 받을 경우: https://start.spring.io/
+  - **Dependencies**: **Spring Web**, **Spring Data JPA**, **H2 Database**, **PostgreSQL Driver**
+
+```bash
+./mvnw spring-boot:run
 ```
 
-### 3.2 쿼리 메서드
-```java
-public interface TodoRepository extends JpaRepository<Todo, Long> {
-    // 메서드 이름으로 쿼리 생성
-    List<Todo> findByTitle(String title);
-    List<Todo> findByCompleted(boolean completed);
-    List<Todo> findByTitleContaining(String keyword);
-    List<Todo> findByTitleAndCompleted(String title, boolean completed);
-    
-    // 정렬
-    List<Todo> findByCompletedOrderByCreatedAtDesc(boolean completed);
-    
-    // 개수
-    long countByCompleted(boolean completed);
-    
-    // 존재 여부
-    boolean existsByTitle(String title);
-}
-```
-
-### 3.3 @Query 어노테이션
-```java
-public interface TodoRepository extends JpaRepository<Todo, Long> {
-    // JPQL (Java Persistence Query Language)
-    @Query("SELECT t FROM Todo t WHERE t.completed = :completed")
-    List<Todo> findTodosByCompleted(@Param("completed") boolean completed);
-    
-    // 네이티브 쿼리
-    @Query(value = "SELECT * FROM todos WHERE completed = :completed", nativeQuery = true)
-    List<Todo> findTodosByCompletedNative(@Param("completed") boolean completed);
-    
-    // 수정 쿼리
-    @Modifying
-    @Query("UPDATE Todo t SET t.completed = true WHERE t.id = :id")
-    void markAsCompleted(@Param("id") Long id);
-}
-```
-
-### 3.4 페이징 및 정렬
-```java
-public interface TodoRepository extends JpaRepository<Todo, Long> {
-    Page<Todo> findByCompleted(boolean completed, Pageable pageable);
-    List<Todo> findByCompleted(boolean completed, Sort sort);
-}
-
-// 사용
-@Service
-public class TodoService {
-    public Page<Todo> getTodos(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return todoRepository.findAll(pageable);
-    }
-}
-```
+서버만 뜨면 OK (`localhost:8080` 은 에러 페이지여도 무방).
 
 ---
 
-## 4. 엔티티 관계 매핑 (90분)
+## 【Lab 1】 H2 로 먼저 연결 — 프로필 방식 (약 15분)
 
-### 4.1 @OneToMany / @ManyToOne
-```java
-// User 엔티티
-@Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String username;
-    private String email;
-    
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Todo> todos = new ArrayList<>();
-}
+**프로필을 쓰는 이유**: Java 코드 수정 없이 `h2` ↔ `pg` 만 바꿔 끼우기 위해.
 
-// Todo 엔티티
-@Entity
-public class Todo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String title;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-}
-```
+다음 세 파일은 `src/main/resources/` 에 둔다. (긴 버전은 `materials.md` 참고.)
 
-### 4.2 @ManyToMany
-```java
-// User 엔티티
-@Entity
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @ManyToMany
-    @JoinTable(
-        name = "user_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
-}
+**`application.properties`**
 
-// Role 엔티티
-@Entity
-public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    private String name;
-    
-    @ManyToMany(mappedBy = "roles")
-    private Set<User> users = new HashSet<>();
-}
-```
-
-### 4.3 FetchType
-- **EAGER (즉시 로딩)**: 연관 엔티티를 조회할 때 함께 한 번에 가져옴
-  - 기본값: @OneToMany, @ManyToMany
-  - **주의**: N+1 문제나 불필요한 조인으로 성능 저하 가능 → 필요한 경우에만 사용
-- **LAZY (지연 로딩)**: 연관 엔티티에 실제로 접근할 때 조회
-  - 기본값: @ManyToOne, @OneToOne
-  - **권장**: 대부분의 경우 LAZY 사용. 필요한 시점에만 DB 조회해 성능에 유리
-
-```java
-@ManyToOne(fetch = FetchType.LAZY)  // 지연 로딩 권장
-@JoinColumn(name = "user_id")
-private User user;
-```
-
-- **언제 EAGER를 쓸까요?** → 해당 연관 데이터를 거의 항상 함께 쓰는 소수의 관계일 때만 고려
-
-### 4.4 CascadeType
-```java
-@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-// ALL: 모든 작업 전파
-// PERSIST: 저장만 전파
-// REMOVE: 삭제만 전파
-// MERGE: 병합만 전파
-private List<Todo> todos;
-```
-
----
-
-## 5. 데이터베이스 설정 (60분)
-
-### 5.0 PostgreSQL 설치 - 따라하기 (비전공자용)
-
-- **💡 왜 PostgreSQL?** 무료·오픈소스 관계형 DB. Spring Boot와 잘 맞고, 실무에서도 자주 사용
-- **설치 (Windows)**  
-  1. [postgresql.org/download/windows](https://www.postgresql.org/download/windows) 접속  
-  2. "Download the installer" → 본인 OS에 맞게 다운로드  
-  3. 설치 시 **비밀번호** 설정 (postgres 사용자용. 꼭 기억해두기)  
-  4. 포트 5432는 기본값 그대로
-- **설치 (Mac)**  
-  1. **방법 A - Homebrew** (Homebrew 있으면):  
-     - `brew install postgresql@15` → `brew services start postgresql@15`  
-     - 기본 사용자: 현재 Mac 로그인 계정. `psql postgres` 로 접속
-  2. **방법 B - Postgres.app** (GUI, 초보자 추천):  
-     - [postgresapp.com](https://postgresapp.com/) 다운로드 → Applications로 드래그  
-     - 실행 후 "Initialize" 클릭  
-  3. **방법 C - EDB Installer** (Windows와 동일 방식):  
-     - [postgresql.org/download/macos](https://www.postgresql.org/download/macos) 접속  
-     - EDB 다운로드 → .dmg 실행 → 설치
-- **DB 생성**  
-  - **Windows**: pgAdmin 실행 또는 터미널 `psql -U postgres` 접속  
-  - **Mac**: 터미널에서 `psql postgres` (Homebrew) 또는 `psql -U postgres` (EDB/Postgres.app) 접속  
-  - 접속 후 `CREATE DATABASE tododb;` 실행
-
-### 5.1 PostgreSQL 설정
 ```properties
-# application.properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
-spring.datasource.username=postgres
-spring.datasource.password=yourpassword
-spring.datasource.driver-class-name=org.postgresql.Driver
-
+spring.application.name=todo-db
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.open-in-view=false
+
+spring.profiles.active=h2
+```
+
+**`application-h2.properties`**
+
+```properties
+spring.datasource.url=jdbc:h2:file:~/likelion-todo;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+spring.datasource.username=sa
+spring.datasource.password=
+spring.datasource.driver-class-name=org.h2.Driver
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+
+**`application-pg.properties`** — 비번은 나중 Lab 6에서 본인 환경에 맞게 수정
+
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5432/tododb
+spring.datasource.username=postgres
+spring.datasource.password=YOUR_PASSWORD
+spring.datasource.driver-class-name=org.postgresql.Driver
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
-### 5.2 ddl-auto 옵션
-- **create**: 애플리케이션 시작 시 기존 테이블 삭제 후 새로 생성 (주의: 데이터 삭제됨)
-- **update**: 시작 시 엔티티에 맞게 스키마를 변경 (컬럼 추가 등). **개발 환경**에서 편리
-- **validate**: 엔티티와 DB 스키마가 일치하는지 검증만. 불일치 시 기동 실패
-- **none**: DDL 관련 작업을 하지 않음
-- **create-drop**: create와 동일하나, 종료 시 테이블을 삭제 (테스트용)
-
-- **실무 권장**: 개발은 `update`, 운영(프로덕션)은 `validate` 또는 `none`
-  - 운영에서는 Flyway, Liquibase 같은 마이그레이션 도구로 스키마 관리
-
-### 5.3 데이터 초기화
-```sql
--- src/main/resources/data.sql
-INSERT INTO todos (title, description, completed, created_at) VALUES
-('리액트 공부하기', 'React Hooks 학습', false, NOW()),
-('Spring Boot 공부하기', 'JPA 학습', false, NOW());
-```
+**H2 Console**: `http://localhost:8080/h2-console` → JDBC URL이 **properties와 동일한지** 확인 후 Connect.
 
 ---
 
-## 6. 실습: Todo API 서버 완성 (30분)
+## 【Lab 2】 `Todo` 엔티티 (약 15분)
 
-### 요구사항
-1. Todo 엔티티 생성
-2. User 엔티티 생성 (Todo와 관계)
-3. Repository 생성
-4. Service 및 Controller 구현
-5. 데이터베이스 연동 테스트
-
-### 엔티티 관계
-```
-User (1) -----< (N) Todo
-```
+`Todo.java` 패키지만 본인 프로젝트에 맞추고 전체 복사한다. 코드는 **`materials.md`** 의 「Todo 엔티티 전체」 블록과 동일.
 
 ---
 
-## 📝 오늘의 핵심 정리
-1. ✅ JPA/Hibernate 이해
-2. ✅ 엔티티 설계 및 매핑
-3. ✅ Spring Data JPA 활용
-4. ✅ 엔티티 관계 매핑
-5. ✅ 데이터베이스 연동
+## 【Lab 3】 `TodoRepository` (약 10분)
 
-## 🏠 과제
-1. User와 Todo 관계를 가진 API 서버 만들기
-2. 쿼리 메서드 연습
-3. 다음 주차 준비: Axios 문서 읽어오기
+`JpaRepository` 상속 인터페이스 + `findByCompleted`, `findByTitleContainingIgnoreCase` 포함. 코드는 **`materials.md`** 참고.
 
-## 📚 참고 자료
-- [Spring Data JPA 공식 문서](https://spring.io/projects/spring-data-jpa)
-- [JPA 공식 문서](https://www.oracle.com/java/technologies/persistence-jsp.html)
-- [Hibernate 공식 문서](https://hibernate.org/)
+---
 
+## 【Lab 4】 `TodoService` + `TodoController` (약 25분)
+
+4주차와 같은 **Controller → Service → Repository** 흐름. 전체 예시는 **`materials.md`** 에 있다.
+
+4주차에 **메모리 기반 Todo** 클래스·컨트롤러가 있다면 파일을 **정리해서 하나만** 남긴다.
+
+---
+
+## 【Lab 5】 Postman — H2 에서 검증 (약 10분)
+
+| 단계 | Method | URL 예시 |
+|------|--------|----------|
+| 1 | GET | `http://localhost:8080/api/todos` |
+| 2 | POST | `{"title":"첫 할일","description":"연습"`} |
+| 3 | GET | 목록 재확인 |
+| 4 | 서버 재시작 후 GET | 파일 H2 라면 데이터 유지 |
+
+---
+
+## 【Lab 6】 PostgreSQL 로 전환 (약 35~45분)
+
+Java 코드 변경 없음. **설정·데이터만** 교체한다.
+
+1. PostgreSQL 설치 또는 기존 인스턴스 사용 — [postgresql.org/download](https://www.postgresql.org/download/)
+2. `CREATE DATABASE tododb;`
+3. `application-pg.properties` 의 `YOUR_PASSWORD`(및 필요 시 username) 수정
+4. `application.properties` 에서 **`spring.profiles.active=pg`**
+5. 서버 재기동 후 연결 에러가 없으면 성공 단계 진입
+
+---
+
+## 【Lab 7】 같은 API 재검증 (약 10~15분)
+
+`pg` 프로필로 Postman 재호출. 필요 시 새로 POST해서 데이터 채운 뒤 목록 확인.
+
+**(시간 되면)** `GET /api/todos/search?completed=false` 등 Lab 7 예시 라우트는 `materials.md` 의 컨트롤러 참고 블록에 맞춰 추가.
+
+---
+
+## 【Lab 8·선택】 `exercises.md` 확장 과제
+
+`@Query`, User와 Todo 관계, BaseEntity 분리 등은 **추가 실습**/과제 심화.
+
+---
+
+## 과제
+
+`exercises.md` — **단계 1(H2)·단계 2(Postgresql)** 를 연속 과제 줄기로 확인.
+
+---
+
+## 다음 주
+
+6주차에서는 이 API를 **React + Axios**로 호출한다. 백엔드에 **CORS** 열어두면 수업이 수월하다.
