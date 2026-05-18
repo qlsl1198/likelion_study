@@ -4,6 +4,30 @@
 
 ---
 
+## 0. 처음부터 끝까지 타이핑 순서
+
+1. 백엔드 프로젝트에서 `./mvnw spring-boot:run`
+2. Postman으로 `GET http://localhost:8080/api/todos`
+3. 백엔드에 `config/CorsConfig.java` 추가
+4. 백엔드 재실행
+5. React 프로젝트 생성
+6. `npm install axios`
+7. `src/api/axios.js` 작성
+8. `src/App.js`에서 목록 조회 구현
+9. 추가 기능 구현
+10. 삭제 또는 완료 토글 구현
+11. Chrome Network 탭에서 요청 확인
+12. 필요하면 `src/hooks/useTodos.js`로 분리
+
+### 다음 단계로 넘어가기 전 확인
+
+- 백엔드 단독 API가 실패하면 React를 고치지 않는다.
+- React 화면은 뜨는데 목록이 안 나오면 Network 탭을 본다.
+- Network에 요청 자체가 없으면 React 이벤트/함수 호출을 확인한다.
+- 요청은 있는데 실패하면 Status Code와 Response를 본다.
+
+---
+
 ## 1. Spring CORS 설정
 
 ```java
@@ -167,6 +191,17 @@ export default function useTodos() {
 4. Request URL이 `http://localhost:8080/api/todos`인지 확인
 5. Status Code 확인
 6. Console에 CORS/Network 에러 확인
+
+### Status Code 빠른 해석
+
+| Status | 의미 | 다음 행동 |
+|--------|------|-----------|
+| 200 | 조회 성공 | 화면 state 업데이트 확인 |
+| 201 | 생성 성공 | 목록 다시 불러오기 확인 |
+| 204 | 삭제 성공 | 목록에서 사라졌는지 확인 |
+| 400 | 요청 body 문제 | `title` 값 확인 |
+| 404 | URL 문제 | `/api`와 컨트롤러 경로 확인 |
+| 500 | 서버 내부 에러 | Spring Boot 터미널 로그 확인 |
 
 ---
 

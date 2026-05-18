@@ -159,6 +159,50 @@
             </section>
 
             <section>
+                <h2>수업 진행 방식</h2>
+                <ol>
+                    <li>먼저 <strong>파일 위치</strong>를 확인합니다.</li>
+                    <li>슬라이드의 코드를 그대로 타이핑하거나 복사합니다.</li>
+                    <li>파일 하나가 끝날 때마다 <strong>서버 실행, H2 Console, Postman</strong>으로 확인합니다.</li>
+                    <li>확인이 안 되면 다음 단계로 넘어가지 않습니다.</li>
+                </ol>
+                <div class="callout">
+                    오늘은 “한 번에 이해”가 아니라 <strong>같은 순서로 따라 해서 동작시키기</strong>가 목표입니다.
+                </div>
+            </section>
+
+            <section>
+                <h2>오늘 멈춰서 확인할 지점</h2>
+                <table>
+                    <thead>
+                        <tr><th>체크포인트</th><th>성공 기준</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>A</td><td>H2 Console 접속 성공</td></tr>
+                        <tr><td>B</td><td>H2 Console에서 <code>TODOS</code> 테이블 확인</td></tr>
+                        <tr><td>C</td><td>Postman <code>POST /api/todos</code> → 201</td></tr>
+                        <tr><td>D</td><td>서버 재시작 후에도 H2 데이터 유지</td></tr>
+                        <tr><td>E</td><td><code>pg</code> 프로필에서 같은 API 동작</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>파일 만들 순서</h2>
+                <pre><code class="text">src/main/resources/
+├── application.properties
+├── application-h2.properties
+└── application-pg.properties
+
+src/main/java/.../
+├── domain/Todo.java
+├── domain/TodoRepository.java
+├── service/TodoService.java
+└── controller/TodoController.java</code></pre>
+                <p class="muted">폴더가 없으면 직접 만들고, <code>package</code> 줄은 본인 프로젝트 이름에 맞춥니다.</p>
+            </section>
+
+            <section>
                 <h2>오늘 수업 목표</h2>
                 <ul>
                     <li>4주차 Todo API를 <strong>DB 저장 API</strong>로 바꾼다.</li>
@@ -634,6 +678,19 @@ public class TodoController {
             </section>
 
             <section>
+                <h2>H2 검증이 끝난 학생 체크</h2>
+                <ul>
+                    <li>Postman 응답에 <code>id</code>가 생겼나요?</li>
+                    <li>H2 Console에서 <code>select * from todos;</code>를 실행해 봤나요?</li>
+                    <li>서버를 껐다 켠 뒤에도 같은 데이터가 보이나요?</li>
+                    <li><code>jdbc:h2:file</code>을 쓰고 있나요? <code>jdbc:h2:mem</code>이면 재시작 시 사라집니다.</li>
+                </ul>
+                <div class="callout">
+                    이 네 가지가 확인되면 PostgreSQL 전환으로 넘어갑니다.
+                </div>
+            </section>
+
+            <section>
                 <h2>Postman 생성 요청</h2>
                 <pre><code class="http">POST http://localhost:8080/api/todos
 Content-Type: application/json</code></pre>
@@ -725,6 +782,17 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect<
                         <tr><td>DB 없음</td><td><code>CREATE DATABASE tododb;</code> 실행 여부</td></tr>
                     </tbody>
                 </table>
+            </section>
+
+            <section>
+                <h2>질문할 때 이렇게 말하기</h2>
+                <pre><code class="text">몇 단계: 예) Lab 2 H2 Console 접속
+실행한 명령: ./mvnw spring-boot:run
+기대한 결과: H2 Console Connect 성공
+실제 결과: Database not found
+터미널 마지막 20줄:
+...</code></pre>
+                <p class="muted">단계와 에러 메시지가 있으면 바로 원인을 좁힐 수 있습니다.</p>
             </section>
 
             <section>

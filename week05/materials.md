@@ -4,6 +4,38 @@
 
 ---
 
+## 0. 처음부터 끝까지 타이핑 순서
+
+아래 순서만 지키면 됩니다.
+
+1. `pom.xml` 의존성 확인
+2. `application.properties` 작성
+3. `application-h2.properties` 작성
+4. `application-pg.properties` 작성
+5. 서버 실행 후 H2 Console 접속
+6. `domain/Todo.java` 작성
+7. 서버 재실행 후 H2 Console에서 테이블 확인
+8. `domain/TodoRepository.java` 작성
+9. `service/TodoService.java` 작성
+10. `controller/TodoController.java` 작성
+11. Postman으로 H2에서 `GET`, `POST`, `PATCH`, `DELETE` 확인
+12. 서버 재시작 후 데이터 유지 확인
+13. PostgreSQL에 `tododb` 생성
+14. `spring.profiles.active=pg`로 변경
+15. Postman으로 같은 API 재확인
+
+### 멈춰야 하는 기준
+
+아래 중 하나라도 실패하면 다음 단계로 넘어가지 않습니다.
+
+- 서버가 실행되지 않음
+- H2 Console에 접속되지 않음
+- `TODOS` 테이블이 생성되지 않음
+- Postman `POST /api/todos`가 실패함
+- PostgreSQL 전환 후 서버가 실행되지 않음
+
+---
+
 ## 1. 프로젝트 의존성
 
 Spring Initializr에서 넣으면 `pom.xml`에 자동으로 들어갑니다. 빠졌다면 아래 의존성을 추가합니다.
@@ -359,6 +391,12 @@ Content-Type: application/json
 }
 ```
 
+성공 기준:
+
+- Status: `201 Created`
+- Response Body에 `id`가 생김
+- `completed` 값이 `false`
+
 ### 단건 조회
 
 ```http
@@ -392,6 +430,11 @@ GET http://localhost:8080/api/todos/search?keyword=JPA
 ```http
 DELETE http://localhost:8080/api/todos/1
 ```
+
+성공 기준:
+
+- Status: `204 No Content`
+- 다시 `GET /api/todos/1` 했을 때 조회되지 않거나 에러가 남
 
 ---
 
@@ -438,6 +481,19 @@ select * from todos;
 | `password authentication failed` | `application-pg.properties` 비밀번호 오타 |
 | `database "tododb" does not exist` | `CREATE DATABASE tododb;` 실행 여부 |
 | `Port 8080 already in use` | 기존 서버 종료 또는 `server.port=8081` |
+
+### 에러 질문 템플릿
+
+질문할 때 아래처럼 적으면 바로 도와주기 쉽습니다.
+
+```text
+몇 단계: 예) H2 Console 접속
+실행한 명령: ./mvnw spring-boot:run
+기대한 결과: H2 Console Connect 성공
+실제 결과: Database not found
+터미널 마지막 20줄:
+...
+```
 
 ---
 

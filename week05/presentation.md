@@ -11,6 +11,30 @@
 
 ---
 
+## 이 자료를 따라가는 방법
+
+수업 중에는 아래 규칙대로만 진행합니다.
+
+1. **파일 위치를 먼저 확인한다.**  
+   예: `src/main/resources/application.properties`, `src/main/java/.../domain/Todo.java`
+2. **코드를 한 번에 다 외우려고 하지 않는다.**  
+   슬라이드의 코드를 그대로 타이핑하거나 복사하고, 패키지명만 본인 프로젝트에 맞춘다.
+3. **파일 하나를 만들 때마다 실행 또는 확인을 한다.**  
+   설정 파일을 만든 뒤 H2 Console 확인, Entity를 만든 뒤 테이블 확인, Controller를 만든 뒤 Postman 확인.
+4. **에러가 나면 다음 단계로 넘어가지 않는다.**  
+   터미널 마지막 20~30줄, Postman 상태 코드, H2 Console URL을 먼저 확인한다.
+
+### 완성 기준
+
+아래가 되면 5주차 핵심 실습은 성공입니다.
+
+- H2 프로필에서 `POST /api/todos`로 Todo가 저장된다.
+- 서버를 껐다 켜도 H2에 저장한 Todo가 남아 있다.
+- `spring.profiles.active=pg`로 바꾼 뒤 PostgreSQL에서도 같은 API가 동작한다.
+- H2와 PostgreSQL 전환 과정에서 Java 코드를 새로 고치지 않는다.
+
+---
+
 ## 오늘 만들 결과물
 
 수업이 끝나면 아래 API가 동작해야 합니다.
@@ -64,6 +88,22 @@ INSERT INTO todos (...) VALUES (...);
 | 2:00~2:35 | PostgreSQL 전환 | `pg` 프로필 실행 |
 | 2:35~2:55 | 같은 API 재검증 | PostgreSQL에 저장 |
 | 2:55~3:00 | 과제 안내 | 제출 체크리스트 확인 |
+
+---
+
+## 실습 전 준비 체크리스트
+
+수업을 시작하기 전에 아래를 확인합니다.
+
+| 확인 항목 | 성공 기준 |
+|-----------|-----------|
+| JDK | 터미널에서 `java -version` 실행 가능 |
+| 프로젝트 | IntelliJ에서 Spring Boot 프로젝트가 열림 |
+| 백엔드 실행 | `./mvnw spring-boot:run` 또는 `mvnw.cmd spring-boot:run` 가능 |
+| Postman | `GET http://localhost:8080` 요청을 보낼 수 있음 |
+| PostgreSQL | 후반 실습 전까지 설치 또는 접속 준비 |
+
+PostgreSQL이 아직 준비되지 않아도 초반 H2 실습은 그대로 진행할 수 있습니다.
 
 ---
 

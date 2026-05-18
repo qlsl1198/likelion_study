@@ -10,6 +10,33 @@
 
 ---
 
+## 제출용 전체 따라하기 순서
+
+아래 순서대로 진행하면 됩니다. 중간 단계를 건너뛰지 않습니다.
+
+| 순서 | 해야 할 일 | 확인 방법 |
+|------|------------|-----------|
+| 1 | `pom.xml` 의존성 확인 | Web, Data JPA, H2, PostgreSQL Driver |
+| 2 | 프로필 설정 파일 3개 생성 | `application.properties`, `application-h2.properties`, `application-pg.properties` |
+| 3 | `spring.profiles.active=h2`로 실행 | H2 Console 접속 |
+| 4 | `Todo` 엔티티 작성 | H2 Console에서 `TODOS` 테이블 확인 |
+| 5 | Repository/Service/Controller 작성 | Spring Boot 서버 에러 없이 실행 |
+| 6 | Postman으로 H2 API 검증 | POST 후 GET에서 데이터 확인 |
+| 7 | 서버 재시작 후 H2 재검증 | 데이터 유지 확인 |
+| 8 | PostgreSQL `tododb` 생성 | `CREATE DATABASE tododb;` |
+| 9 | `spring.profiles.active=pg`로 전환 | 서버가 PostgreSQL에 연결됨 |
+| 10 | Postman으로 PostgreSQL API 검증 | 같은 URL로 POST/GET 성공 |
+
+### 중간 체크포인트
+
+- **체크포인트 A**: `http://localhost:8080/h2-console` 접속 성공
+- **체크포인트 B**: H2 Console에 `TODOS` 테이블 생성
+- **체크포인트 C**: Postman `POST /api/todos` 응답이 `201 Created`
+- **체크포인트 D**: 서버 재시작 후에도 H2 `GET /api/todos`에 데이터가 남아 있음
+- **체크포인트 E**: PostgreSQL 전환 후 같은 API가 동작
+
+---
+
 ## 1단계: H2 + JPA 로 Todo 저장·조회 (필수)
 
 ### 목표
@@ -27,6 +54,18 @@
 2. **`presentation.md` / `materials.md`** 와 같은 방식으로 **프로필** 구성 후 `spring.profiles.active=h2`  
 3. `Todo` 엔티티, `TodoRepository`, `TodoService`, `TodoController` 구현 (강의 `materials.md` 예시 활용 가능)  
 
+### 파일별 작성 위치
+
+| 파일 | 위치 예시 |
+|------|-----------|
+| 공통 설정 | `src/main/resources/application.properties` |
+| H2 설정 | `src/main/resources/application-h2.properties` |
+| PostgreSQL 설정 | `src/main/resources/application-pg.properties` |
+| Todo 엔티티 | `src/main/java/.../domain/Todo.java` |
+| Repository | `src/main/java/.../domain/TodoRepository.java` |
+| Service | `src/main/java/.../service/TodoService.java` |
+| Controller | `src/main/java/.../controller/TodoController.java` |
+
 ### 제출 증명 (1단계)
 
 - Postman 또는 동등 도구: **POST 후 GET** 스크린샷 1장 이상  
@@ -36,6 +75,7 @@
 
 - JDK 버전, `./mvnw spring-boot:run`  
 - 1단계에서 쓴 H2 JDBC URL 한 줄 요약  
+- H2에서 테스트한 API 목록 (`GET`, `POST`, `DELETE` 등)
 
 ---
 
@@ -52,6 +92,14 @@
 2. `application-pg.properties` 의 접속 정보(사용자·비밀번호)를 본인 환경으로 수정  
 3. `spring.profiles.active=pg` 로 전환 후 기동 확인  
 4. Postman 로 `GET /api/todos` · `POST /api/todos` 가 정상 동작하는지 확인 (DB가 비었으니 필요 시 새로 POST)  
+
+### PostgreSQL 전환 확인 순서
+
+1. `application.properties`에서 `spring.profiles.active=pg` 확인
+2. 서버 실행 로그에서 PostgreSQL 연결 에러가 없는지 확인
+3. Postman에서 `GET http://localhost:8080/api/todos`
+4. 빈 배열이면 정상일 수 있음. H2 데이터가 자동으로 옮겨지는 것은 아님
+5. `POST /api/todos`로 새 데이터를 넣고 다시 `GET`
 
 ### 제출 증명 (2단계)
 
@@ -119,8 +167,10 @@ JPQL 또는 `nativeQuery` 로 조건 검색 하나를 직접 작성.
 
 - 조직 저장소 규칙을 따름  
 - 불필요한 `target/`, 로컬 DB 파일은 `.gitignore`  
+- README와 스크린샷만 봐도 실행 순서와 결과를 알 수 있게 정리  
 
 ## 팁
 
 - `ddl-auto=update` 는 **학습 환경**용. 운영 서버에는 다른 전략을 쓴다.  
 - H2 에서 채워 둔 데이터는 **PostgreSQL 로 자동 이전되지 않는다** — 2단계 입장에서는 새로 입력하거나 과제에서는 그 사실만 README 에 적어도 된다.
+- 막히면 “어느 체크포인트에서 실패했는지”를 먼저 적고 질문한다.

@@ -5,6 +5,31 @@
 
 ---
 
+## 제출용 전체 따라하기 순서
+
+| 순서 | 해야 할 일 | 확인 방법 |
+|------|------------|-----------|
+| 1 | 백엔드 실행 | Postman `GET /api/todos` 성공 |
+| 2 | CORS 설정 추가 | React 출처 `http://localhost:3000` 허용 |
+| 3 | React 프로젝트 생성 | `npm start`로 화면 열림 |
+| 4 | Axios 설치 | `package.json`에 `axios` 존재 |
+| 5 | `src/api/axios.js` 작성 | `baseURL`이 `http://localhost:8080/api` |
+| 6 | `App.js`에 목록 조회 작성 | 새로고침 시 GET 요청 발생 |
+| 7 | 추가 기능 작성 | 버튼 클릭 시 POST 요청 발생 |
+| 8 | 삭제 또는 완료 토글 작성 | DELETE 또는 PATCH 요청 발생 |
+| 9 | 로딩/에러 문구 추가 | 실패 시 화면에 메시지 표시 |
+| 10 | Network 탭 캡처 | 요청 URL과 Status가 보이게 캡처 |
+
+### 중간 체크포인트
+
+- **체크포인트 A**: 백엔드 단독 `GET /api/todos` 성공
+- **체크포인트 B**: React 화면이 `localhost:3000`에서 열림
+- **체크포인트 C**: Network 탭에서 `GET /api/todos` 요청 확인
+- **체크포인트 D**: 추가 후 `POST /api/todos` 요청 확인
+- **체크포인트 E**: 삭제 또는 완료 토글 요청 확인
+
+---
+
 ## 제출 전제
 
 백엔드에는 아래 API가 준비되어 있어야 합니다.
@@ -39,6 +64,12 @@ React(`localhost:3000`)에서 Spring Boot(`localhost:8080`) API를 호출할 수
 - `CorsConfig.java`
 - `src/api/axios.js`
 - 백엔드/프론트 실행 명령을 적은 README
+
+### 실패하면 먼저 볼 것
+
+- CORS 에러면 백엔드를 재실행했는지 확인
+- `Network Error`면 Spring Boot가 켜져 있는지 확인
+- 404면 `baseURL` 끝에 `/api`가 들어갔는지 확인
 
 ---
 
@@ -151,6 +182,7 @@ npm start
 - 프론트 주소: `http://localhost:3000`
 - 구현한 기능 목록
 - 막혔던 오류와 해결 방법 1개 이상
+- 캡처한 Network 요청 목록 (`GET`, `POST`, `DELETE` 또는 `PATCH`)
 
 ---
 
